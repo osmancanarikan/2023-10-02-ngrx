@@ -1,6 +1,6 @@
 module.exports = {
-  displayName: 'shared-ui',
-  preset: '../../../jest.preset.js',
+  displayName: 'shared-http',
+
   setupFilesAfterEnv: ['<rootDir>/src/test-setup.ts'],
   globals: {
     'ts-jest': {
@@ -8,7 +8,7 @@ module.exports = {
       stringifyContentPathRegex: '\\.(html|svg)$',
     },
   },
-  coverageDirectory: '../../../coverage/libs/shared/ui',
+  coverageDirectory: '../../../coverage/libs/shared/http',
   transform: {
     '^.+\\.(ts|mjs|js|html)$': 'jest-preset-angular',
   },
@@ -18,4 +18,5 @@ module.exports = {
     'jest-preset-angular/build/serializers/ng-snapshot',
     'jest-preset-angular/build/serializers/html-comment',
   ],
+  preset: '../../../jest.preset.ts',
 };

@@ -1,6 +1,5 @@
 {
   "projectType": "library",
-  "root": "libs/holidays/model",
   "sourceRoot": "libs/holidays/model/src",
   "prefix": "eternal",
   "targets": {
@@ -8,7 +7,7 @@
       "executor": "@nrwl/jest:jest",
       "outputs": ["coverage/libs/holidays/model"],
       "options": {
-        "jestConfig": "libs/holidays/model/jest.config.js",
+        "jestConfig": "libs/holidays/model/jest.config.ts",
         "passWithNoTests": true
       }
     },

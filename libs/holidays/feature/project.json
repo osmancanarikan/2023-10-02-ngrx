@@ -1,6 +1,5 @@
 {
   "projectType": "library",
-  "root": "libs/holidays/feature",
   "sourceRoot": "libs/holidays/feature/src",
   "prefix": "eternal",
   "targets": {
@@ -8,7 +7,7 @@
       "executor": "@nrwl/jest:jest",
       "outputs": ["coverage/libs/holidays/feature"],
       "options": {
-        "jestConfig": "libs/holidays/feature/jest.config.js",
+        "jestConfig": "libs/holidays/feature/jest.config.ts",
         "passWithNoTests": true
       }
     },

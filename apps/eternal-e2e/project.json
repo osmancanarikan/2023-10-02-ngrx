@@ -1,5 +1,4 @@
 {
-  "root": "apps/eternal-e2e",
   "sourceRoot": "apps/eternal-e2e/src",
   "projectType": "application",
   "targets": {

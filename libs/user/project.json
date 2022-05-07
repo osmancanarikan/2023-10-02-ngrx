@@ -1,6 +1,5 @@
 {
   "projectType": "library",
-  "root": "libs/user",
   "sourceRoot": "libs/user/src",
   "prefix": "eternal",
   "targets": {
@@ -8,7 +7,7 @@
       "executor": "@nrwl/jest:jest",
       "outputs": ["coverage/libs/user"],
       "options": {
-        "jestConfig": "libs/user/jest.config.js",
+        "jestConfig": "libs/user/jest.config.ts",
         "passWithNoTests": true
       }
     },

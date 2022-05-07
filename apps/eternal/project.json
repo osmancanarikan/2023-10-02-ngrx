@@ -1,6 +1,5 @@
 {
   "projectType": "application",
-  "root": "apps/eternal",
   "sourceRoot": "apps/eternal/src",
   "prefix": "eternal",
   "targets": {
@@ -99,7 +98,7 @@
       "executor": "@nrwl/jest:jest",
       "outputs": ["coverage/apps/eternal"],
       "options": {
-        "jestConfig": "apps/eternal/jest.config.js",
+        "jestConfig": "apps/eternal/jest.config.ts",
         "passWithNoTests": true
       }
     }

@@ -1,6 +1,5 @@
 {
   "projectType": "library",
-  "root": "libs/shared/master-data",
   "sourceRoot": "libs/shared/master-data/src",
   "prefix": "eternal",
   "targets": {
@@ -8,7 +7,7 @@
       "executor": "@nrwl/jest:jest",
       "outputs": ["coverage/libs/shared/master-data"],
       "options": {
-        "jestConfig": "libs/shared/master-data/jest.config.js",
+        "jestConfig": "libs/shared/master-data/jest.config.ts",
         "passWithNoTests": true
       }
     },

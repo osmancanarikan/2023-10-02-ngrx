@@ -1,6 +1,5 @@
 {
   "projectType": "library",
-  "root": "libs/diary/feature",
   "sourceRoot": "libs/diary/feature/src",
   "prefix": "eternal",
   "targets": {
@@ -8,7 +7,7 @@
       "executor": "@nrwl/jest:jest",
       "outputs": ["coverage/libs/diary/feature"],
       "options": {
-        "jestConfig": "libs/diary/feature/jest.config.js",
+        "jestConfig": "libs/diary/feature/jest.config.ts",
         "passWithNoTests": true
       }
     },
