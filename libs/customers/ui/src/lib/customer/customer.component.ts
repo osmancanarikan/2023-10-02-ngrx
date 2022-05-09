@@ -21,10 +21,18 @@ export class CustomerComponent implements OnInit {
 
   ngOnInit() {
     this.fields = [
-      formly.requiredText('firstname', 'Firstname'),
-      formly.requiredText('name', 'Name'),
-      formly.requiredSelect('country', 'Country', this.countries),
-      formly.requiredDate('birthdate', 'Birthdate'),
+      formly.requiredText('firstname', 'Firstname', {
+        attributes: { 'data-testid': 'inp-firstname' },
+      }),
+      formly.requiredText('name', 'Name', {
+        attributes: { 'data-testid': 'inp-lastname' },
+      }),
+      formly.requiredSelect('country', 'Country', this.countries, {
+        attributes: { 'data-testid': 'inp-country' },
+      }),
+      formly.requiredDate('birthdate', 'Birthdate', {
+        attributes: { 'data-testid': 'inp-birthdate' },
+      }),
     ];
   }
 
