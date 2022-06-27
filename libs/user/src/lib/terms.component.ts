@@ -1,5 +1,5 @@
 import { Component, EventEmitter, NgModule, Output } from '@angular/core';
-import { FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { UntypedFormGroup, ReactiveFormsModule } from '@angular/forms';
 import { FormlyFieldConfig, FormlyModule } from '@ngx-formly/core';
 import { formly } from 'ngx-formly-helpers';
 
@@ -18,7 +18,7 @@ import { formly } from 'ngx-formly-helpers';
 })
 export class TermsComponent {
   @Output() next = new EventEmitter();
-  formGroup = new FormGroup({});
+  formGroup = new UntypedFormGroup({});
   model = { terms: false, gdpr: false };
   fields: FormlyFieldConfig[] = [
     formly.requiredCheckbox(

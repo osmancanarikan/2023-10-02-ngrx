@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { FormGroup } from '@angular/forms';
+import { UntypedFormGroup } from '@angular/forms';
 import { Customer } from '@eternal/customers/model';
 import { Options } from '@eternal/shared/form';
 import { FormlyFieldConfig } from '@ngx-formly/core';
@@ -11,7 +11,7 @@ import { formly } from 'ngx-formly-helpers';
   styleUrls: ['./customer.component.scss'],
 })
 export class CustomerComponent implements OnInit {
-  formGroup = new FormGroup({});
+  formGroup = new UntypedFormGroup({});
   @Input() customer: Customer | undefined;
   @Input() countries: Options = [];
   @Input() showDeleteButton = true;

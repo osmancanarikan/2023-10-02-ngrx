@@ -5,7 +5,6 @@
     "defaultBase": "master"
   },
   "cli": {
-    "defaultCollection": "@nrwl/angular",
     "packageManager": "yarn"
   },
   "implicitDependencies": {
@@ -19,22 +18,9 @@
     "default": {
       "runner": "nx/tasks-runners/default",
       "options": {
-        "cacheableOperations": [
-          "build",
-          "lint",
-          "test",
-          "e2e"
-        ]
+        "cacheableOperations": ["build", "lint", "test", "e2e"]
       }
     }
-  },
-  "targetDependencies": {
-    "build": [
-      {
-        "target": "build",
-        "projects": "dependencies"
-      }
-    ]
   },
   "generators": {
     "@nrwl/angular:application": {
@@ -51,5 +37,11 @@
       "style": "scss"
     }
   },
-  "defaultProject": "eternal"
+  "defaultProject": "eternal",
+  "$schema": "./node_modules/nx/schemas/nx-schema.json",
+  "targetDefaults": {
+    "build": {
+      "dependsOn": ["^build"]
+    }
+  }
 }

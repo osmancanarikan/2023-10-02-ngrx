@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup } from '@angular/forms';
+import { UntypedFormBuilder, UntypedFormGroup } from '@angular/forms';
 import { Observable, Subject } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
 import { AddressLookuper } from '../address-lookuper.service';
@@ -9,7 +9,7 @@ import { AddressLookuper } from '../address-lookuper.service';
   templateUrl: './request-info.component.html',
 })
 export class RequestInfoComponent implements OnInit {
-  formGroup: FormGroup = this.formBuilder.group({
+  formGroup: UntypedFormGroup = this.formBuilder.group({
     address: [],
   });
   title = 'Request More Information';
@@ -18,7 +18,7 @@ export class RequestInfoComponent implements OnInit {
   lookupResult$: Observable<string> | undefined;
 
   constructor(
-    private formBuilder: FormBuilder,
+    private formBuilder: UntypedFormBuilder,
     private lookuper: AddressLookuper
   ) {}
 
