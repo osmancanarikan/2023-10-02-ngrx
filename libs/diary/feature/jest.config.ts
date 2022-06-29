@@ -1,6 +1,7 @@
+/* eslint-disable */
 export default {
   displayName: 'diary-feature',
-
+  preset: '../../../jest.preset.js',
   setupFilesAfterEnv: ['<rootDir>/src/test-setup.ts'],
   globals: {
     'ts-jest': {
@@ -18,5 +19,4 @@ export default {
     'jest-preset-angular/build/serializers/ng-snapshot',
     'jest-preset-angular/build/serializers/html-comment',
   ],
-  preset: '../../../jest.preset.js',
 };

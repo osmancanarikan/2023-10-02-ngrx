@@ -1,12 +1,13 @@
 {
+  "$schema": "./node_modules/nx/schemas/nx-schema.json",
   "npmScope": "eternal",
-  "useDaemonProcess": false,
   "affected": {
     "defaultBase": "master"
   },
   "cli": {
     "packageManager": "yarn"
   },
+  "defaultProject": "eternal",
   "implicitDependencies": {
     "package.json": {
       "dependencies": "*",
@@ -22,6 +23,11 @@
       }
     }
   },
+  "targetDefaults": {
+    "build": {
+      "dependsOn": ["^build"]
+    }
+  },
   "generators": {
     "@nrwl/angular:application": {
       "style": "scss",
@@ -35,13 +41,6 @@
     },
     "@nrwl/angular:component": {
       "style": "scss"
-    }
-  },
-  "defaultProject": "eternal",
-  "$schema": "./node_modules/nx/schemas/nx-schema.json",
-  "targetDefaults": {
-    "build": {
-      "dependsOn": ["^build"]
     }
   }
 }

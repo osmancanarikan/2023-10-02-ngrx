@@ -1,5 +1,4 @@
 {
-  "$schema": "..\\..\\node_modules\\nx\\schemas\\project-schema.json",
   "projectType": "application",
   "sourceRoot": "apps/eternal/src",
   "prefix": "eternal",
@@ -47,20 +46,6 @@
           "extractLicenses": false,
           "sourceMap": true,
           "namedChunks": true
-        },
-        "local": {
-          "fileReplacements": [
-            {
-              "replace": "apps/eternal/src/environments/environment.ts",
-              "with": "apps/eternal/src/environments/environment.local.ts"
-            }
-          ],
-          "buildOptimizer": false,
-          "optimization": false,
-          "vendorChunk": true,
-          "extractLicenses": false,
-          "sourceMap": true,
-          "namedChunks": true
         }
       },
       "defaultConfiguration": "production"
@@ -73,9 +58,6 @@
         },
         "development": {
           "browserTarget": "eternal:build:development"
-        },
-        "local": {
-          "browserTarget": "eternal:build:local"
         }
       },
       "defaultConfiguration": "development"
@@ -89,10 +71,7 @@
     "lint": {
       "executor": "@nrwl/linter:eslint",
       "options": {
-        "lintFilePatterns": [
-          "apps/eternal/src/**/*.ts",
-          "apps/eternal/src/**/*.html"
-        ]
+        "lintFilePatterns": ["apps/eternal/**/*.ts", "apps/eternal/**/*.html"]
       }
     },
     "test": {

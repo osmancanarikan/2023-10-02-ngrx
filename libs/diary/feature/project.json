@@ -1,5 +1,4 @@
 {
-  "$schema": "..\\..\\..\\node_modules\\nx\\schemas\\project-schema.json",
   "projectType": "library",
   "sourceRoot": "libs/diary/feature/src",
   "prefix": "eternal",
@@ -16,11 +15,11 @@
       "executor": "@nrwl/linter:eslint",
       "options": {
         "lintFilePatterns": [
-          "libs/diary/feature/src/**/*.ts",
-          "libs/diary/feature/src/**/*.html"
+          "libs/diary/feature/**/*.ts",
+          "libs/diary/feature/**/*.html"
         ]
       }
     }
   },
-  "tags": ["domain:diary", "type:feature"]
+  "tags": ["domain:customers", "type:feature"]
 }

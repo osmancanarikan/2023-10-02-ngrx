@@ -48,7 +48,10 @@ export const diaryFeature = createFeature({
         ...state,
         loaded: true,
         diaries: diaries,
-        diaryEntries: diaryEntries.flat(),
+        diaryEntries: diaryEntries.reduce(
+          (acc, diaryEntry) => acc.concat(diaryEntry),
+          []
+        ),
       };
     }),
     on(actions.addSuccess, (state, action) => {

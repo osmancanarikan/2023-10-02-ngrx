@@ -1,5 +1,4 @@
 {
-  "$schema": "..\\..\\..\\node_modules\\nx\\schemas\\project-schema.json",
   "projectType": "library",
   "sourceRoot": "libs/holidays/feature/src",
   "prefix": "eternal",
@@ -16,8 +15,8 @@
       "executor": "@nrwl/linter:eslint",
       "options": {
         "lintFilePatterns": [
-          "libs/holidays/feature/src/**/*.ts",
-          "libs/holidays/feature/src/**/*.html"
+          "libs/holidays/feature/**/*.ts",
+          "libs/holidays/feature/**/*.html"
         ]
       }
     }

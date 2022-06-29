@@ -1,5 +1,4 @@
 {
-  "$schema": "..\\..\\..\\node_modules\\nx\\schemas\\project-schema.json",
   "projectType": "library",
   "sourceRoot": "libs/customers/ui/src",
   "prefix": "eternal",
@@ -16,8 +15,8 @@
       "executor": "@nrwl/linter:eslint",
       "options": {
         "lintFilePatterns": [
-          "libs/customers/ui/src/**/*.ts",
-          "libs/customers/ui/src/**/*.html"
+          "libs/customers/ui/**/*.ts",
+          "libs/customers/ui/**/*.html"
         ]
       }
     }

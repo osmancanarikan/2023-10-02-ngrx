@@ -1,5 +1,4 @@
 {
-  "$schema": "..\\..\\..\\node_modules\\nx\\schemas\\project-schema.json",
   "projectType": "library",
   "sourceRoot": "libs/shared/config/src",
   "prefix": "eternal",
@@ -16,8 +15,8 @@
       "executor": "@nrwl/linter:eslint",
       "options": {
         "lintFilePatterns": [
-          "libs/shared/config/src/**/*.ts",
-          "libs/shared/config/src/**/*.html"
+          "libs/shared/config/**/*.ts",
+          "libs/shared/config/**/*.html"
         ]
       }
     }
