@@ -4,14 +4,14 @@ import { Holiday } from '@eternal/holidays/model';
 import { Configuration } from '@eternal/shared/config';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { concatMap, map, switchMap } from 'rxjs/operators';
-import * as actions from './holidays.actions';
+import { holidaysActions } from './holidays.actions';
 
 @Injectable()
 export class HolidaysEffects {
   #baseUrl = '/holiday';
-  load$ = createEffect(() =>
-    this.actions$.pipe(
-      ofType(actions.load),
+  load$ = createEffect(() => {
+    return this.actions$.pipe(
+      ofType(holidaysActions.load),
       switchMap(() => this.httpClient.get<Holiday[]>(this.#baseUrl)),
       map((holidays) =>
         holidays.map((holiday) => ({
@@ -19,31 +19,31 @@ export class HolidaysEffects {
           imageUrl: `${this.config.baseUrl}${holiday.imageUrl}`,
         }))
       ),
-      map((holidays) => actions.loaded({ holidays }))
-    )
-  );
+      map((holidays) => holidaysActions.loaded({ holidays }))
+    );
+  });
 
-  addFavourite$ = createEffect(() =>
-    this.actions$.pipe(
-      ofType(actions.addFavourite),
+  addFavourite$ = createEffect(() => {
+    return this.actions$.pipe(
+      ofType(holidaysActions.addFavourite),
       concatMap(({ id }) =>
         this.httpClient
           .post<void>(`${this.#baseUrl}/favourite/${id}`, {})
-          .pipe(map(() => actions.favouriteAdded({ id })))
+          .pipe(map(() => holidaysActions.favouriteAdded({ id })))
       )
-    )
-  );
+    );
+  });
 
-  removeFavourite$ = createEffect(() =>
-    this.actions$.pipe(
-      ofType(actions.removeFavourite),
+  removeFavourite$ = createEffect(() => {
+    return this.actions$.pipe(
+      ofType(holidaysActions.removeFavourite),
       concatMap(({ id }) =>
         this.httpClient
           .delete(`${this.#baseUrl}/favourite/${id}`)
-          .pipe(map(() => actions.favouriteRemoved({ id })))
+          .pipe(map(() => holidaysActions.favouriteRemoved({ id })))
       )
-    )
-  );
+    );
+  });
 
   constructor(
     private actions$: Actions,

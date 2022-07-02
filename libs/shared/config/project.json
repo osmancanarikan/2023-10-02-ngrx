@@ -1,6 +1,5 @@
 {
   "projectType": "library",
-  "root": "libs/shared/config",
   "sourceRoot": "libs/shared/config/src",
   "prefix": "eternal",
   "targets": {
@@ -8,7 +7,7 @@
       "executor": "@nrwl/jest:jest",
       "outputs": ["coverage/libs/shared/config"],
       "options": {
-        "jestConfig": "libs/shared/config/jest.config.js",
+        "jestConfig": "libs/shared/config/jest.config.ts",
         "passWithNoTests": true
       }
     },
@@ -16,8 +15,8 @@
       "executor": "@nrwl/linter:eslint",
       "options": {
         "lintFilePatterns": [
-          "libs/shared/config/src/**/*.ts",
-          "libs/shared/config/src/**/*.html"
+          "libs/shared/config/**/*.ts",
+          "libs/shared/config/**/*.html"
         ]
       }
     }

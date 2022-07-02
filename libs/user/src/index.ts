@@ -1,1 +1,1 @@
-export * from './lib/user.module';
+export { userRoutes } from './lib/user.routes';

@@ -1,6 +1,5 @@
 import { fakeAsync, TestBed } from '@angular/core/testing';
 import { RequestInfoComponent } from './request-info.component';
-import { RequestInfoComponentModule } from './request-info.component.module';
 import { render, screen } from '@testing-library/angular';
 import {
   HttpClientTestingModule,
@@ -26,7 +25,7 @@ const mockLookup = (query: string, response: unknown[]) => {
 describe('Request Info Component', () => {
   const setup = async (address: string = '') =>
     render(RequestInfoComponent, {
-      imports: [RequestInfoComponentModule, HttpClientTestingModule],
+      imports: [RequestInfoComponent, HttpClientTestingModule],
       excludeComponentDeclaration: true,
       componentProperties: { address },
     });

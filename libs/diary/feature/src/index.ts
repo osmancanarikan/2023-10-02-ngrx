@@ -1,1 +1,1 @@
-export * from './lib/diary-feature.module';
+export { diaryRoutes } from './lib/diary.routes';

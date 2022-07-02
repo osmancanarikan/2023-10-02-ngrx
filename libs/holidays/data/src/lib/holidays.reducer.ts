@@ -1,6 +1,6 @@
 import { Holiday } from '@eternal/holidays/model';
 import { createFeature, createReducer, on } from '@ngrx/store';
-import { favouriteAdded, favouriteRemoved, loaded } from './holidays.actions';
+import { holidaysActions } from './holidays.actions';
 
 export interface HolidaysState {
   holidays: Holiday[];
@@ -13,22 +13,28 @@ export const holidaysFeature = createFeature({
   name: 'holidays',
   reducer: createReducer<HolidaysState>(
     initialState,
-    on(loaded, (state, { holidays }) => ({
-      ...state,
-      holidays,
-    })),
-    on(favouriteAdded, (state, { id }) => {
+    on(
+      holidaysActions.loaded,
+      (state, { holidays }): HolidaysState => ({
+        ...state,
+        holidays,
+      })
+    ),
+    on(holidaysActions.favouriteAdded, (state, { id }): HolidaysState => {
       if (state.favouriteIds.includes(id)) {
         return state;
       }
 
       return { ...state, favouriteIds: [...state.favouriteIds, id] };
     }),
-    on(favouriteRemoved, (state, { id }) => ({
-      ...state,
-      favouriteIds: state.favouriteIds.filter(
-        (favouriteId) => favouriteId !== id
-      ),
-    }))
+    on(
+      holidaysActions.favouriteRemoved,
+      (state, { id }): HolidaysState => ({
+        ...state,
+        favouriteIds: state.favouriteIds.filter(
+          (favouriteId) => favouriteId !== id
+        ),
+      })
+    )
   ),
 });

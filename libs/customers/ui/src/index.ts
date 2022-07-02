@@ -1,3 +1,5 @@
-export { CustomerComponentModule } from './lib/customer/customer.component.module';
-export { CustomersComponentModule } from './lib/customers/customers.component.module';
-export { CustomersViewModel } from './lib/customers/customers.component';
+export { CustomerComponent } from './lib/customer/customer.component';
+export {
+  CustomersComponent,
+  CustomersViewModel,
+} from './lib/customers/customers.component';

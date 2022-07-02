@@ -1,5 +1,5 @@
 import { createFeature, createReducer, on } from '@ngrx/store';
-import { loaded } from './bookings.actions';
+import { bookingsActions } from './bookings.actions';
 
 export type BookingStatus =
   | 'pending'
@@ -30,7 +30,7 @@ export const bookingsFeature = createFeature({
   name: 'bookings',
   reducer: createReducer(
     initialState,
-    on(loaded, (state, action) => ({
+    on(bookingsActions.loaded, (state, action) => ({
       ...state,
       bookings: action.bookings,
       loaded: true,

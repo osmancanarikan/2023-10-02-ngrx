@@ -1,6 +1,5 @@
 {
   "projectType": "library",
-  "root": "libs/shared/ngrx-utils",
   "sourceRoot": "libs/shared/ngrx-utils/src",
   "prefix": "eternal",
   "targets": {
@@ -8,7 +7,7 @@
       "executor": "@nrwl/jest:jest",
       "outputs": ["coverage/libs/shared/ngrx-utils"],
       "options": {
-        "jestConfig": "libs/shared/ngrx-utils/jest.config.js",
+        "jestConfig": "libs/shared/ngrx-utils/jest.config.ts",
         "passWithNoTests": true
       }
     },
@@ -16,8 +15,8 @@
       "executor": "@nrwl/linter:eslint",
       "options": {
         "lintFilePatterns": [
-          "libs/shared/ngrx-utils/src/**/*.ts",
-          "libs/shared/ngrx-utils/src/**/*.html"
+          "libs/shared/ngrx-utils/**/*.ts",
+          "libs/shared/ngrx-utils/**/*.html"
         ]
       }
     }

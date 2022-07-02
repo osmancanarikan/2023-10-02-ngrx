@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, NgModule } from '@angular/core';
+import { Component } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { RouterModule } from '@angular/router';
 import { SecurityService } from '@eternal/shared/security';
@@ -8,6 +8,8 @@ import { SecurityService } from '@eternal/shared/security';
   selector: 'eternal-header',
   templateUrl: './header.component.html',
   styleUrls: ['./header.component.scss'],
+  standalone: true,
+  imports: [CommonModule, MatButtonModule, RouterModule],
 })
 export class HeaderComponent {
   user$ = this.userService.getLoadedUser$();
@@ -18,10 +20,3 @@ export class HeaderComponent {
     this.userService.signOut();
   }
 }
-
-@NgModule({
-  imports: [CommonModule, MatButtonModule, RouterModule],
-  declarations: [HeaderComponent],
-  exports: [HeaderComponent],
-})
-export class HeaderComponentModule {}

@@ -76,7 +76,10 @@
                   "type:shared:util"
                 ]
               },
-              { "sourceTag": "type:ui", "bannedExternalImports": ["@ngrx/**"] },
+              {
+                "sourceTag": "type:ui",
+                "bannedExternalImports": ["@ngrx/**"]
+              },
               {
                 "sourceTag": "type:shared:http",
                 "onlyDependOnLibsWithTags": [
@@ -102,6 +105,10 @@
       "files": ["*.js", "*.jsx"],
       "extends": ["plugin:@nrwl/nx/javascript"],
       "rules": {}
+    },
+    {
+      "files": ["*.ts"],
+      "extends": ["plugin:@ngrx/strict"]
     }
   ]
 }

@@ -1,21 +1,14 @@
-import { createAction, props } from '@ngrx/store';
-import { User } from './security.reducer';
+import { createActionGroup, emptyProps, props } from '@ngrx/store';
+import { User } from './securityState';
 
-export const loadUser = createAction('[Security] Load User');
-export const loadUserSuccess = createAction(
-  '[Security] User Loaded',
-  props<{ user: User }>()
-);
-export const signInUser = createAction(
-  '[Security] Sign-In User',
-  props<{ email: string; password: string }>()
-);
-export const signInUserSuccess = createAction(
-  '[Security] Sign-In User Success',
-  props<{ user: User }>()
-);
-export const signOutUser = createAction('[Security] Sign-Out User');
-export const signOutUserSuccess = createAction(
-  '[Security] Sign-Out User Success',
-  props<{ user: User }>()
-);
+export const securityActions = createActionGroup({
+  source: 'Security',
+  events: {
+    'Load User': emptyProps(),
+    'Load User Success': props<{ user: User }>(),
+    'Sign In User': props<{ email: string; password: string }>(),
+    'Sign In User Success': props<{ user: User }>(),
+    'Sign Out User': emptyProps(),
+    'Sign Out User Success': props<{ user: User }>(),
+  },
+});

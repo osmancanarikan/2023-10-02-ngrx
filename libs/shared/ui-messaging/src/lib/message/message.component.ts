@@ -2,6 +2,8 @@ import { animate, style, transition, trigger } from '@angular/animations';
 import { Component } from '@angular/core';
 import { Message } from './message';
 import { MessageStore } from './message.store';
+import { MatIconModule } from '@angular/material/icon';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'eternal-message',
@@ -19,6 +21,8 @@ import { MessageStore } from './message.store';
       }
     `,
   ],
+  standalone: true,
+  imports: [CommonModule, MatIconModule],
   animations: [
     trigger('myTrigger', [
       transition(':enter', [

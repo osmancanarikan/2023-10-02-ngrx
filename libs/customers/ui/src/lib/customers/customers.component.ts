@@ -5,9 +5,18 @@ import {
   OnChanges,
   Output,
 } from '@angular/core';
-import { MatSlideToggleChange } from '@angular/material/slide-toggle';
-import { MatTableDataSource } from '@angular/material/table';
+import {
+  MatSlideToggleChange,
+  MatSlideToggleModule,
+} from '@angular/material/slide-toggle';
+import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { Customer } from '@eternal/customers/model';
+import { RouterModule } from '@angular/router';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
+import { CommonModule } from '@angular/common';
+import { MatPaginatorModule } from '@angular/material/paginator';
+import { CustomerPipe } from '../customer.pipe';
 
 export interface CustomerWithSelected extends Customer {
   selected: boolean;
@@ -21,6 +30,17 @@ export interface CustomersViewModel {
 @Component({
   selector: 'eternal-customers',
   templateUrl: './customers.component.html',
+  standalone: true,
+  imports: [
+    RouterModule,
+    MatIconModule,
+    MatButtonModule,
+    CommonModule,
+    CustomerPipe,
+    MatPaginatorModule,
+    MatTableModule,
+    MatSlideToggleModule,
+  ],
 })
 export class CustomersComponent implements OnChanges {
   @Input() viewModel: CustomersViewModel | undefined;

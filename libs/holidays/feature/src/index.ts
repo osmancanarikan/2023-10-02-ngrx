@@ -1,1 +1,1 @@
-export * from './lib/holidays-feature.module';
+export { holidaysRoutes } from './lib/holidays.routes';

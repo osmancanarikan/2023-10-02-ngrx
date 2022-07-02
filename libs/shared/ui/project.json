@@ -1,6 +1,5 @@
 {
   "projectType": "library",
-  "root": "libs/shared/ui",
   "sourceRoot": "libs/shared/ui/src",
   "prefix": "eternal",
   "targets": {
@@ -8,7 +7,7 @@
       "executor": "@nrwl/jest:jest",
       "outputs": ["coverage/libs/shared/ui"],
       "options": {
-        "jestConfig": "libs/shared/ui/jest.config.js",
+        "jestConfig": "libs/shared/ui/jest.config.ts",
         "passWithNoTests": true
       }
     },
@@ -16,8 +15,8 @@
       "executor": "@nrwl/linter:eslint",
       "options": {
         "lintFilePatterns": [
-          "libs/shared/ui/src/**/*.ts",
-          "libs/shared/ui/src/**/*.html"
+          "libs/shared/ui/**/*.ts",
+          "libs/shared/ui/**/*.html"
         ]
       }
     }

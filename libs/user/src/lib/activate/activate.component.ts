@@ -1,16 +1,19 @@
 import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
-import { FormGroup } from '@angular/forms';
+import { ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
-import { FormlyFieldConfig } from '@ngx-formly/core';
+import { FormlyFieldConfig, FormlyModule } from '@ngx-formly/core';
 import { formly } from 'ngx-formly-helpers';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'eternal-activate',
   templateUrl: './activate.component.html',
+  standalone: true,
+  imports: [CommonModule, ReactiveFormsModule, FormlyModule],
 })
 export class ActivateComponent {
-  formGroup = new FormGroup({});
+  formGroup = new UntypedFormGroup({});
   model = { terms: false, gdpr: false };
   fields: FormlyFieldConfig[] = [
     formly.requiredNumber('activationCode', 'Activation Code'),

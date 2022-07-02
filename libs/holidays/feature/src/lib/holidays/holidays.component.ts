@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Holiday } from '@eternal/holidays/model';
 import { fromHolidays, holidaysActions } from '@eternal/holidays/data';
+import { CommonModule } from '@angular/common';
+import { HolidayCardComponent } from '@eternal/holidays/ui';
 
 @Component({
   selector: 'eternal-holidays',
@@ -15,6 +17,8 @@ import { fromHolidays, holidaysActions } from '@eternal/holidays/data';
       >
       </eternal-holiday-card>
     </div> `,
+  standalone: true,
+  imports: [CommonModule, HolidayCardComponent],
 })
 export class HolidaysComponent implements OnInit {
   holidays$ = this.store.select(fromHolidays.selectHolidaysWithFavourite);

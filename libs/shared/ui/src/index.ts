@@ -1,1 +1,1 @@
-export { BlinkerDirectiveModule } from './lib/blinker.directive';
+export { BlinkerDirective } from './lib/blinker.directive';

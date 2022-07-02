@@ -1,8 +1,9 @@
-import { NgModule, Pipe, PipeTransform } from '@angular/core';
+import { Pipe, PipeTransform } from '@angular/core';
 import { Customer } from '@eternal/customers/model';
 
 @Pipe({
   name: 'customer',
+  standalone: true,
 })
 export class CustomerPipe implements PipeTransform {
   transform(customer: Customer): string {
@@ -12,9 +13,3 @@ export class CustomerPipe implements PipeTransform {
     return `${customer.name}, ${customer.firstname}`;
   }
 }
-
-@NgModule({
-  declarations: [CustomerPipe],
-  exports: [CustomerPipe],
-})
-export class CustomerPipeModule {}

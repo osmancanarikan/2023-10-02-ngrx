@@ -1,6 +1,5 @@
 {
   "projectType": "library",
-  "root": "libs/shared/form",
   "sourceRoot": "libs/shared/form/src",
   "prefix": "eternal",
   "targets": {
@@ -8,7 +7,7 @@
       "executor": "@nrwl/jest:jest",
       "outputs": ["coverage/libs/shared/form"],
       "options": {
-        "jestConfig": "libs/shared/form/jest.config.js",
+        "jestConfig": "libs/shared/form/jest.config.ts",
         "passWithNoTests": true
       }
     },
@@ -16,8 +15,8 @@
       "executor": "@nrwl/linter:eslint",
       "options": {
         "lintFilePatterns": [
-          "libs/shared/form/src/**/*.ts",
-          "libs/shared/form/src/**/*.html"
+          "libs/shared/form/**/*.ts",
+          "libs/shared/form/**/*.html"
         ]
       }
     }

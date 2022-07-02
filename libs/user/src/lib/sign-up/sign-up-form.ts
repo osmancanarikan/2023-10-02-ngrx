@@ -1,5 +1,5 @@
-import { FormGroup } from '@angular/forms';
+import { UntypedFormGroup } from '@angular/forms';
 
 export interface SignUpForm {
-  formGroup: FormGroup;
+  formGroup: UntypedFormGroup;
 }

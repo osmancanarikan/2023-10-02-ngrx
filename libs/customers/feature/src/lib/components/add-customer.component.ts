@@ -1,12 +1,12 @@
 import { CommonModule } from '@angular/common';
-import { Component, NgModule } from '@angular/core';
+import { Component } from '@angular/core';
 import { Customer } from '@eternal/customers/model';
-import { CustomerComponentModule } from '@eternal/customers/ui';
 import { Options } from '@eternal/shared/form';
-import { fromMaster } from '@eternal/shared/master-data';
+import { selectCountries } from '@eternal/shared/master-data';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
-import { add } from '../+state/customers.actions';
+import { customersActions } from '../+state/customers.actions';
+import { CustomerComponent } from '@eternal/customers/ui';
 
 @Component({
   selector: 'eternal-add-customer',
@@ -17,6 +17,8 @@ import { add } from '../+state/customers.actions';
     (save)="submit($event)"
     [showDeleteButton]="false"
   ></eternal-customer>`,
+  standalone: true,
+  imports: [CustomerComponent, CommonModule],
 })
 export class AddCustomerComponent {
   customer: Customer = {
@@ -29,17 +31,12 @@ export class AddCustomerComponent {
   countries$: Observable<Options>;
 
   constructor(private store: Store) {
-    this.countries$ = this.store.select(fromMaster.selectCountries);
+    this.countries$ = this.store.select(selectCountries);
   }
 
   submit(customer: Customer) {
-    this.store.dispatch(add({ customer: { ...customer, id: 0 } }));
+    this.store.dispatch(
+      customersActions.add({ customer: { ...customer, id: 0 } })
+    );
   }
 }
-
-@NgModule({
-  declarations: [AddCustomerComponent],
-  exports: [AddCustomerComponent],
-  imports: [CustomerComponentModule, CommonModule],
-})
-export class AddCustomerComponentModule {}

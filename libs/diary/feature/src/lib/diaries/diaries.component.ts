@@ -1,14 +1,9 @@
-import { Component, NgModule } from '@angular/core';
+import { Component } from '@angular/core';
 
 @Component({
   selector: 'eternal-diaries',
   templateUrl: './diaries.component.html',
   styleUrls: ['./diaries.component.scss'],
+  standalone: true,
 })
 export class DiariesComponent {}
-
-@NgModule({
-  declarations: [DiariesComponent],
-  exports: [DiariesComponent],
-})
-export class DiariesComponentModule {}

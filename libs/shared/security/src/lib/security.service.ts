@@ -2,8 +2,8 @@ import { Injectable } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { combineLatest, Observable } from 'rxjs';
 import { filter, map } from 'rxjs/operators';
-import { loadUser, signInUser, signOutUser } from './security.actions';
-import { User } from './security.reducer';
+import { securityActions } from './security.actions';
+import { User } from './securityState';
 import { fromSecurity } from './security.selectors';
 
 @Injectable({ providedIn: 'root' })
@@ -30,15 +30,15 @@ export class SecurityService {
   }
 
   load() {
-    this.store.dispatch(loadUser());
+    this.store.dispatch(securityActions.loadUser());
   }
 
   signIn(email: string, password: string) {
-    this.store.dispatch(signInUser({ email, password }));
+    this.store.dispatch(securityActions.signInUser({ email, password }));
   }
 
   signOut() {
-    this.store.dispatch(signOutUser());
+    this.store.dispatch(securityActions.signOutUser());
   }
 
   #verifyUser(user$: Observable<undefined | User>) {

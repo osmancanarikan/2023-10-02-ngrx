@@ -1,14 +1,14 @@
 import { CommonModule } from '@angular/common';
-import { Component, NgModule } from '@angular/core';
+import { Component } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Customer } from '@eternal/customers/model';
-import { CustomerComponentModule } from '@eternal/customers/ui';
+import { CustomerComponent } from '@eternal/customers/ui';
 import { Options } from '@eternal/shared/form';
-import { fromMaster } from '@eternal/shared/master-data';
+import { selectCountries } from '@eternal/shared/master-data';
 import { Store } from '@ngrx/store';
 import { combineLatest, Observable } from 'rxjs';
 import { filter, map } from 'rxjs/operators';
-import { remove, update } from '../+state/customers.actions';
+import { customersActions } from '../+state/customers.actions';
 import { fromCustomers } from '../+state/customers.selectors';
 
 @Component({
@@ -20,13 +20,15 @@ import { fromCustomers } from '../+state/customers.selectors';
     (save)="this.submit($event)"
     (remove)="this.remove($event)"
   ></eternal-customer>`,
+  standalone: true,
+  imports: [CommonModule, CustomerComponent],
 })
 export class EditCustomerComponent {
   data$: Observable<{ customer: Customer; countries: Options }>;
   customerId = 0;
 
   constructor(private store: Store, private route: ActivatedRoute) {
-    const countries$ = this.store.select(fromMaster.selectCountries);
+    const countries$: Observable<Options> = this.store.select(selectCountries);
     const customer$ = this.store
       .select(
         fromCustomers.selectById(
@@ -49,7 +51,7 @@ export class EditCustomerComponent {
 
   submit(customer: Customer) {
     this.store.dispatch(
-      update({
+      customersActions.update({
         customer: { ...customer, id: this.customerId },
       })
     );
@@ -57,7 +59,9 @@ export class EditCustomerComponent {
 
   remove(customer: Customer) {
     this.store.dispatch(
-      remove({ customer: { ...customer, id: this.customerId } })
+      customersActions.remove({
+        customer: { ...customer, id: this.customerId },
+      })
     );
   }
 
@@ -71,10 +75,3 @@ export class EditCustomerComponent {
     return customer$.pipe(filter(customerGuard));
   }
 }
-
-@NgModule({
-  declarations: [EditCustomerComponent],
-  exports: [EditCustomerComponent],
-  imports: [CommonModule, CustomerComponentModule],
-})
-export class EditCustomerComponentModule {}

@@ -5,22 +5,25 @@ import {
   HttpTestingController,
 } from '@angular/common/http/testing';
 import { HolidaysComponent } from './holidays.component';
-import { HolidaysComponentModule } from './holidays.component.module';
 import { StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
 import { Configuration } from '@eternal/shared/config';
 import { createHolidays } from '@eternal/holidays/model';
-import { HolidaysDataModule } from '@eternal/holidays/data';
+// eslint-disable-next-line @nrwl/nx/enforce-module-boundaries
+import { holidaysFeature } from '../../../../data/src/lib/holidays.reducer';
+// eslint-disable-next-line @nrwl/nx/enforce-module-boundaries
+import { HolidaysEffects } from '../../../../data/src/lib/holidays.effects';
 
 describe('Request Info Component', () => {
   const setup = async () =>
     render(HolidaysComponent, {
       imports: [
-        HolidaysComponentModule,
+        HolidaysComponent,
         StoreModule.forRoot({}),
         EffectsModule.forRoot([]),
-        HolidaysDataModule,
         HttpClientTestingModule,
+        StoreModule.forFeature(holidaysFeature),
+        EffectsModule.forFeature([HolidaysEffects]),
       ],
       providers: [
         {

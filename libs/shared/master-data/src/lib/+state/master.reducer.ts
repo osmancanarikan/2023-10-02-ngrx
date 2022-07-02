@@ -39,8 +39,8 @@ export const masterFeature = createFeature({
   reducer: createReducer<MasterState>(initialState),
 });
 
-export const fromMaster = {
-  selectCountries: createSelector(masterFeature.selectCountries, (countries) =>
+export const selectCountries = createSelector(
+  masterFeature.selectCountries,
+  (countries) =>
     countries.map(({ code, name }) => ({ value: code, label: name }))
-  ),
-};
+);

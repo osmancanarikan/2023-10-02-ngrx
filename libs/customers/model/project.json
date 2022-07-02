@@ -1,6 +1,5 @@
 {
   "projectType": "library",
-  "root": "libs/customers/model",
   "sourceRoot": "libs/customers/model/src",
   "prefix": "eternal",
   "targets": {
@@ -8,7 +7,7 @@
       "executor": "@nrwl/jest:jest",
       "outputs": ["coverage/libs/customers/model"],
       "options": {
-        "jestConfig": "libs/customers/model/jest.config.js",
+        "jestConfig": "libs/customers/model/jest.config.ts",
         "passWithNoTests": true
       }
     },
@@ -16,8 +15,8 @@
       "executor": "@nrwl/linter:eslint",
       "options": {
         "lintFilePatterns": [
-          "libs/customers/model/src/**/*.ts",
-          "libs/customers/model/src/**/*.html"
+          "libs/customers/model/**/*.ts",
+          "libs/customers/model/**/*.html"
         ]
       }
     }
