@@ -1,9 +1,8 @@
-import { combineLatest, filter, map, Observable } from 'rxjs';
+import { Observable } from 'rxjs';
 import { Booking, bookingsFeature } from './bookings.reducer';
-import { isDefined } from '@eternal/shared/util';
 import { Injectable } from '@angular/core';
 import { Store } from '@ngrx/store';
-import { CustomersApi } from '@eternal/customers/api';
+import { bookingsActions } from './bookings.actions';
 
 interface BookingData {
   bookings: Booking[];
@@ -13,20 +12,15 @@ interface BookingData {
 
 @Injectable({ providedIn: 'root' })
 export class BookingsRepository {
-  readonly bookingsData$: Observable<BookingData> = combineLatest({
-    customer: this.customersApi.selectedCustomer$,
-    bookings: this.store.select(bookingsFeature.selectBookings),
-    loaded: this.store.select(bookingsFeature.selectLoaded),
-  }).pipe(
-    filter(({ customer }) => isDefined(customer)),
-    map(({ customer, bookings, loaded }) => {
-      return {
-        customerName: customer.name + ', ' + customer.firstname,
-        bookings,
-        loaded,
-      };
-    })
+  readonly bookings$: Observable<Booking[]> = this.store.select(
+    bookingsFeature.selectBookings
   );
+  readonly loaded$: Observable<boolean> = this.store.select(
+    bookingsFeature.selectLoaded
+  );
+  constructor(private store: Store) {}
 
-  constructor(private store: Store, private customersApi: CustomersApi) {}
+  load(): void {
+    this.store.dispatch(bookingsActions.load());
+  }
 }
