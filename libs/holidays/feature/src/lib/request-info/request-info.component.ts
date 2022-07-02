@@ -1,9 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import {
-  ReactiveFormsModule,
-  UntypedFormBuilder,
-  UntypedFormGroup,
-} from '@angular/forms';
+import { FormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { Observable, Subject } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
 import { AddressLookuper } from '../address-lookuper.service';
@@ -12,6 +8,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
+import { assertDefined } from '@eternal/shared/util';
 
 @Component({
   selector: 'eternal-request-info',
@@ -27,8 +24,8 @@ import { MatButtonModule } from '@angular/material/button';
   ],
 })
 export class RequestInfoComponent implements OnInit {
-  formGroup: UntypedFormGroup = this.formBuilder.group({
-    address: [],
+  formGroup = this.formBuilder.nonNullable.group({
+    address: [''],
   });
   title = 'Request More Information';
   @Input() address = '';
@@ -36,7 +33,7 @@ export class RequestInfoComponent implements OnInit {
   lookupResult$: Observable<string> | undefined;
 
   constructor(
-    private formBuilder: UntypedFormBuilder,
+    private formBuilder: FormBuilder,
     private lookuper: AddressLookuper
   ) {}
 
@@ -46,7 +43,10 @@ export class RequestInfoComponent implements OnInit {
     }
 
     this.lookupResult$ = this.submitter$.pipe(
-      switchMap(() => this.lookuper.lookup(this.formGroup.value.address)),
+      switchMap(() => {
+        assertDefined(this.formGroup.value.address);
+        return this.lookuper.lookup(this.formGroup.value.address);
+      }),
       map((found) => (found ? 'Brochure sent' : 'Address not found'))
     );
   }
