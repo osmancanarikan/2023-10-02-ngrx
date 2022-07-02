@@ -9,8 +9,8 @@ import * as actions from './holidays.actions';
 @Injectable()
 export class HolidaysEffects {
   #baseUrl = '/holiday';
-  load$ = createEffect(() =>
-    this.actions$.pipe(
+  load$ = createEffect(() => {
+    return this.actions$.pipe(
       ofType(actions.load),
       switchMap(() => this.httpClient.get<Holiday[]>(this.#baseUrl)),
       map((holidays) =>
@@ -20,30 +20,30 @@ export class HolidaysEffects {
         }))
       ),
       map((holidays) => actions.loaded({ holidays }))
-    )
-  );
+    );
+  });
 
-  addFavourite$ = createEffect(() =>
-    this.actions$.pipe(
+  addFavourite$ = createEffect(() => {
+    return this.actions$.pipe(
       ofType(actions.addFavourite),
       concatMap(({ id }) =>
         this.httpClient
           .post<void>(`${this.#baseUrl}/favourite/${id}`, {})
           .pipe(map(() => actions.favouriteAdded({ id })))
       )
-    )
-  );
+    );
+  });
 
-  removeFavourite$ = createEffect(() =>
-    this.actions$.pipe(
+  removeFavourite$ = createEffect(() => {
+    return this.actions$.pipe(
       ofType(actions.removeFavourite),
       concatMap(({ id }) =>
         this.httpClient
           .delete(`${this.#baseUrl}/favourite/${id}`)
           .pipe(map(() => actions.favouriteRemoved({ id })))
       )
-    )
-  );
+    );
+  });
 
   constructor(
     private actions$: Actions,

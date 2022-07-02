@@ -1,10 +1,9 @@
 import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { CustomersComponent, CustomersViewModel } from '@eternal/customers/ui';
-import { Store } from '@ngrx/store';
+import { createSelector, Store } from '@ngrx/store';
 import { select, unselect } from '../+state/customers.actions';
 import { fromCustomers } from '../+state/customers.selectors';
-import { map } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 
 @Component({
@@ -19,15 +18,13 @@ import { Observable } from 'rxjs';
   imports: [CommonModule, CustomersComponent],
 })
 export class CustomersContainerComponent {
-  viewModel$: Observable<CustomersViewModel> = this.store
-    .select(fromCustomers.selectPagedCustomers)
-    .pipe(
-      map((pagedCustomers) => ({
-        customers: pagedCustomers.customers,
-        pageIndex: pagedCustomers.page - 1,
-        length: pagedCustomers.total,
-      }))
-    );
+  viewModel$: Observable<CustomersViewModel> = this.store.select(
+    createSelector(fromCustomers.selectPagedCustomers, (pagedCustomers) => ({
+      customers: pagedCustomers.customers,
+      pageIndex: pagedCustomers.page - 1,
+      length: pagedCustomers.total,
+    }))
+  );
 
   constructor(private store: Store) {}
 

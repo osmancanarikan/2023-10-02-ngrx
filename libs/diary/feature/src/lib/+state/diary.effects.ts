@@ -7,16 +7,16 @@ import { DiaryResponse, DiaryWithEntries } from './diary.reducer';
 
 @Injectable()
 export class DiaryEffects {
-  load$ = createEffect(() =>
-    this.actions$.pipe(
+  load$ = createEffect(() => {
+    return this.actions$.pipe(
       ofType(actions.load),
       switchMap(() => this.httpClient.get<DiaryResponse>('/diary')),
       map((diaryResponse) => actions.loadSuccess({ diaryResponse }))
-    )
-  );
+    );
+  });
 
-  add$ = createEffect(() =>
-    this.actions$.pipe(
+  add$ = createEffect(() => {
+    return this.actions$.pipe(
       ofType(actions.add),
       switchMap(({ title, description }) =>
         this.httpClient.post<DiaryWithEntries>('/diary', {
@@ -25,11 +25,11 @@ export class DiaryEffects {
         })
       ),
       map((diaryWithEntries) => actions.addSuccess({ diaryWithEntries }))
-    )
-  );
+    );
+  });
 
-  addEntry$ = createEffect(() =>
-    this.actions$.pipe(
+  addEntry$ = createEffect(() => {
+    return this.actions$.pipe(
       ofType(actions.addEntry),
       switchMap(({ diaryId, content }) =>
         this.httpClient.post('/diary', {
@@ -38,8 +38,8 @@ export class DiaryEffects {
         })
       ),
       map(() => actions.addEntrySuccess())
-    )
-  );
+    );
+  });
 
   constructor(private actions$: Actions, private httpClient: HttpClient) {}
 }

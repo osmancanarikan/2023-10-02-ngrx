@@ -13,22 +13,28 @@ export const holidaysFeature = createFeature({
   name: 'holidays',
   reducer: createReducer<HolidaysState>(
     initialState,
-    on(loaded, (state, { holidays }) => ({
-      ...state,
-      holidays,
-    })),
-    on(favouriteAdded, (state, { id }) => {
+    on(
+      loaded,
+      (state, { holidays }): HolidaysState => ({
+        ...state,
+        holidays,
+      })
+    ),
+    on(favouriteAdded, (state, { id }): HolidaysState => {
       if (state.favouriteIds.includes(id)) {
         return state;
       }
 
       return { ...state, favouriteIds: [...state.favouriteIds, id] };
     }),
-    on(favouriteRemoved, (state, { id }) => ({
-      ...state,
-      favouriteIds: state.favouriteIds.filter(
-        (favouriteId) => favouriteId !== id
-      ),
-    }))
+    on(
+      favouriteRemoved,
+      (state, { id }): HolidaysState => ({
+        ...state,
+        favouriteIds: state.favouriteIds.filter(
+          (favouriteId) => favouriteId !== id
+        ),
+      })
+    )
   ),
 });

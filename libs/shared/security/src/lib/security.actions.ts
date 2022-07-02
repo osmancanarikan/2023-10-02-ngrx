@@ -1,5 +1,5 @@
 import { createAction, props } from '@ngrx/store';
-import { User } from './security.reducer';
+import { User } from './securityState';
 
 export const loadUser = createAction('[Security] Load User');
 export const loadUserSuccess = createAction(

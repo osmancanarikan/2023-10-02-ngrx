@@ -13,8 +13,8 @@ import { add, load, loaded, remove, update } from './customers.actions';
 export class CustomersEffects {
   #baseUrl = '/customers';
 
-  load$ = createEffect(() =>
-    this.actions$.pipe(
+  load$ = createEffect(() => {
+    return this.actions$.pipe(
       ofType(load),
       switchMap(({ page }) =>
         this.http
@@ -27,11 +27,11 @@ export class CustomersEffects {
             )
           )
       )
-    )
-  );
+    );
+  });
 
-  add$ = createEffect(() =>
-    this.actions$.pipe(
+  add$ = createEffect(() => {
+    return this.actions$.pipe(
       ofType(add),
       concatMap(({ customer }) =>
         this.http.post<{ customers: Customer[]; id: number }>(
@@ -42,11 +42,11 @@ export class CustomersEffects {
 
       tap(() => this.router.navigateByUrl('/customers')),
       map(() => load({ page: 1 }))
-    )
-  );
+    );
+  });
 
-  update$ = createEffect(() =>
-    this.actions$.pipe(
+  update$ = createEffect(() => {
+    return this.actions$.pipe(
       ofType(update),
       concatMap(({ customer }) =>
         this.http
@@ -54,19 +54,19 @@ export class CustomersEffects {
           .pipe(tap(() => this.uiMessage.info('Customer has been updated')))
       ),
       map(() => load({ page: 1 }))
-    )
-  );
+    );
+  });
 
-  remove$ = createEffect(() =>
-    this.actions$.pipe(
+  remove$ = createEffect(() => {
+    return this.actions$.pipe(
       ofType(remove),
       concatMap(({ customer }) =>
         this.http.delete<Customer[]>(`${this.#baseUrl}/${customer.id}`)
       ),
       tap(() => this.router.navigateByUrl('/customers')),
       map(() => load({ page: 1 }))
-    )
-  );
+    );
+  });
 
   constructor(
     private actions$: Actions,

@@ -4,7 +4,7 @@ import { ActivatedRoute } from '@angular/router';
 import { Customer } from '@eternal/customers/model';
 import { CustomerComponent } from '@eternal/customers/ui';
 import { Options } from '@eternal/shared/form';
-import { fromMaster } from '@eternal/shared/master-data';
+import { selectCountries } from '@eternal/shared/master-data';
 import { Store } from '@ngrx/store';
 import { combineLatest, Observable } from 'rxjs';
 import { filter, map } from 'rxjs/operators';
@@ -28,7 +28,7 @@ export class EditCustomerComponent {
   customerId = 0;
 
   constructor(private store: Store, private route: ActivatedRoute) {
-    const countries$ = this.store.select(fromMaster.selectCountries);
+    const countries$: Observable<Options> = this.store.select(selectCountries);
     const customer$ = this.store
       .select(
         fromCustomers.selectById(

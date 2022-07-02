@@ -16,7 +16,7 @@ const selectSelectedCustomer = createSelector(
     customers.find((customer) => customer.id === selectedId)
 );
 
-export const selectPagedCustomers = createSelector(
+const selectPagedCustomers = createSelector(
   selectCustomers,
   selectSelectedId,
   customersFeature.selectPage,

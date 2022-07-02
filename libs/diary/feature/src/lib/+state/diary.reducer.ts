@@ -34,9 +34,9 @@ const initialState: DiaryState = {
 
 export const diaryFeature = createFeature({
   name: 'diary',
-  reducer: createReducer(
+  reducer: createReducer<DiaryState>(
     initialState,
-    on(actions.loadSuccess, (state, { diaryResponse }) => {
+    on(actions.loadSuccess, (state, { diaryResponse }): DiaryState => {
       const diaryEntries: DiaryEntry[][] = [];
       const diaries: Diary[] = [];
 
@@ -54,7 +54,7 @@ export const diaryFeature = createFeature({
         ),
       };
     }),
-    on(actions.addSuccess, (state, action) => {
+    on(actions.addSuccess, (state, action): DiaryState => {
       const { entries, ...diary } = action.diaryWithEntries;
       return {
         ...state,

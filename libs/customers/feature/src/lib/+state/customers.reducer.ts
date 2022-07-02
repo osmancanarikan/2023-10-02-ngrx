@@ -20,22 +20,34 @@ export const customersFeature = createFeature({
   name: 'customers',
   reducer: createReducer<CustomersState>(
     initialState,
-    on(load, (state) => ({
-      ...state,
-    })),
-    on(loaded, (state, { customers, total, page }) => ({
-      ...state,
-      customers,
-      total,
-      page,
-    })),
-    on(select, (state, { id }) => ({
-      ...state,
-      selectedId: id,
-    })),
-    on(unselect, (state) => ({
-      ...state,
-      selectedId: undefined,
-    }))
+    on(
+      load,
+      (state): CustomersState => ({
+        ...state,
+      })
+    ),
+    on(
+      loaded,
+      (state, { customers, total, page }): CustomersState => ({
+        ...state,
+        customers,
+        total,
+        page,
+      })
+    ),
+    on(
+      select,
+      (state, { id }): CustomersState => ({
+        ...state,
+        selectedId: id,
+      })
+    ),
+    on(
+      unselect,
+      (state): CustomersState => ({
+        ...state,
+        selectedId: undefined,
+      })
+    )
   ),
 });
