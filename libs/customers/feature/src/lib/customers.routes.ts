@@ -1,26 +1,17 @@
-import { importProvidersFrom } from '@angular/core';
 import { Routes } from '@angular/router';
-import { EffectsModule } from '@ngrx/effects';
-import { StoreModule } from '@ngrx/store';
-import { CustomersEffects } from './+state/customers.effects';
-import { customersFeature } from './+state/customers.reducer';
 import { AddCustomerComponent } from './components/add-customer.component';
 import { CustomersContainerComponent } from './components/customers-container.component';
 import { EditCustomerComponent } from './components/edit-customer.component';
 import { DataGuard } from './services/data.guard';
 import { CustomersRootComponent } from './components/customers-root/customers-root.component';
+import { customersDataProvider } from '@eternal/customers/data';
 
 export const customersRoutes: Routes = [
   {
     path: '',
     canActivate: [DataGuard],
     component: CustomersRootComponent,
-    providers: [
-      importProvidersFrom(
-        StoreModule.forFeature(customersFeature),
-        EffectsModule.forFeature([CustomersEffects])
-      ),
-    ],
+    providers: [customersDataProvider],
     children: [
       {
         path: '',

@@ -2,9 +2,8 @@ import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { CustomersComponent, CustomersViewModel } from '@eternal/customers/ui';
 import { createSelector, Store } from '@ngrx/store';
-import { customersActions } from '../+state/customers.actions';
-import { fromCustomers } from '../+state/customers.selectors';
 import { Observable } from 'rxjs';
+import { customersActions, fromCustomers } from '@eternal/customers/data';
 
 @Component({
   template: ` <eternal-customers

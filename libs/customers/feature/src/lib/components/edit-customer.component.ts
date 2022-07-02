@@ -8,8 +8,7 @@ import { selectCountries } from '@eternal/shared/master-data';
 import { Store } from '@ngrx/store';
 import { combineLatest, Observable } from 'rxjs';
 import { filter, map } from 'rxjs/operators';
-import { customersActions } from '../+state/customers.actions';
-import { fromCustomers } from '../+state/customers.selectors';
+import { customersActions, fromCustomers } from '@eternal/customers/data';
 
 @Component({
   selector: 'eternal-edit-customer',

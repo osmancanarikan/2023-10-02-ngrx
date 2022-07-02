@@ -5,8 +5,8 @@ import { Options } from '@eternal/shared/form';
 import { selectCountries } from '@eternal/shared/master-data';
 import { Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
-import { customersActions } from '../+state/customers.actions';
 import { CustomerComponent } from '@eternal/customers/ui';
+import { customersActions } from '@eternal/customers/data';
 
 @Component({
   selector: 'eternal-add-customer',
