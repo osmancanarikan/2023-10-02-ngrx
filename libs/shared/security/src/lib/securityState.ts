@@ -1,9 +1,5 @@
 import { createFeature, createReducer, on } from '@ngrx/store';
-import {
-  loadUserSuccess,
-  signInUserSuccess,
-  signOutUserSuccess,
-} from './security.actions';
+import { securityActions } from './security.actions';
 
 export interface User {
   id: number;
@@ -28,8 +24,8 @@ export const securityFeature = createFeature({
   reducer: createReducer<SecurityState>(
     initialState,
     on(
-      loadUserSuccess,
-      signInUserSuccess,
+      securityActions.loadUserSuccess,
+      securityActions.signInUserSuccess,
       (state, { user }): SecurityState => ({
         ...state,
         user,
@@ -37,7 +33,7 @@ export const securityFeature = createFeature({
       })
     ),
     on(
-      signOutUserSuccess,
+      securityActions.signOutUserSuccess,
       (state, { user }): SecurityState => ({
         ...state,
         user,

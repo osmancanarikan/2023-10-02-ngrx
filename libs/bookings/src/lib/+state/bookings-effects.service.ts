@@ -5,7 +5,7 @@ import { selectSelectedCustomer } from '@eternal/customers/feature';
 import { Actions, concatLatestFrom, createEffect, ofType } from '@ngrx/effects';
 import { Store } from '@ngrx/store';
 import { filter, map } from 'rxjs';
-import { load, loaded } from './bookings.actions';
+import { bookingsActions } from './bookings.actions';
 import { Booking } from './bookings.reducer';
 
 const bookings: Map<number, Booking[]> = new Map<number, Booking[]>();
@@ -44,13 +44,15 @@ export class BookingsEffects {
     private store: Store
   ) {}
 
-  load$ = createEffect(() =>
-    this.actions$.pipe(
-      ofType(load),
+  load$ = createEffect(() => {
+    return this.actions$.pipe(
+      ofType(bookingsActions.load),
       concatLatestFrom(() => this.store.select(selectSelectedCustomer)),
       map(([, customerId]) => customerId),
       filter(Boolean),
-      map((customer) => loaded({ bookings: bookings.get(customer.id) || [] }))
-    )
-  );
+      map((customer) =>
+        bookingsActions.loaded({ bookings: bookings.get(customer.id) || [] })
+      )
+    );
+  });
 }

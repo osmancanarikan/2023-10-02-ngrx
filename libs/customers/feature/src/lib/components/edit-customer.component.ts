@@ -8,7 +8,7 @@ import { selectCountries } from '@eternal/shared/master-data';
 import { Store } from '@ngrx/store';
 import { combineLatest, Observable } from 'rxjs';
 import { filter, map } from 'rxjs/operators';
-import { remove, update } from '../+state/customers.actions';
+import { customersActions } from '../+state/customers.actions';
 import { fromCustomers } from '../+state/customers.selectors';
 
 @Component({
@@ -51,7 +51,7 @@ export class EditCustomerComponent {
 
   submit(customer: Customer) {
     this.store.dispatch(
-      update({
+      customersActions.update({
         customer: { ...customer, id: this.customerId },
       })
     );
@@ -59,7 +59,9 @@ export class EditCustomerComponent {
 
   remove(customer: Customer) {
     this.store.dispatch(
-      remove({ customer: { ...customer, id: this.customerId } })
+      customersActions.remove({
+        customer: { ...customer, id: this.customerId },
+      })
     );
   }
 

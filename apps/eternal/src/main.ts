@@ -22,10 +22,15 @@ import { FormlyMaterialModule } from '@ngx-formly/material';
 import { sharedMasterDataProvider } from '@eternal/shared/master-data';
 import { appRoutes } from './app/app.routes';
 import { RouterModule } from '@angular/router';
+import { registerLocaleData } from '@angular/common';
+
+import localeDeAt from '@angular/common/locales/de-AT';
 
 if (environment.production) {
   enableProdMode();
 }
+
+registerLocaleData(localeDeAt, 'de-AT');
 
 bootstrapApplication(AppComponent, {
   providers: [

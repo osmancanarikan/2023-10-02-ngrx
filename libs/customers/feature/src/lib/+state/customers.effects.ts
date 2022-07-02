@@ -7,7 +7,7 @@ import { MessageService } from '@eternal/shared/ui-messaging';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { Store } from '@ngrx/store';
 import { concatMap, map, switchMap, tap } from 'rxjs/operators';
-import { add, load, loaded, remove, update } from './customers.actions';
+import { customersActions } from './customers.actions';
 
 @Injectable()
 export class CustomersEffects {
@@ -15,7 +15,7 @@ export class CustomersEffects {
 
   load$ = createEffect(() => {
     return this.actions$.pipe(
-      ofType(load),
+      ofType(customersActions.load),
       switchMap(({ page }) =>
         this.http
           .get<{ content: Customer[]; total: number }>(this.#baseUrl, {
@@ -23,7 +23,7 @@ export class CustomersEffects {
           })
           .pipe(
             map(({ content, total }) =>
-              loaded({ customers: content, total, page })
+              customersActions.loaded({ customers: content, total, page })
             )
           )
       )
@@ -32,7 +32,7 @@ export class CustomersEffects {
 
   add$ = createEffect(() => {
     return this.actions$.pipe(
-      ofType(add),
+      ofType(customersActions.add),
       concatMap(({ customer }) =>
         this.http.post<{ customers: Customer[]; id: number }>(
           this.#baseUrl,
@@ -41,30 +41,30 @@ export class CustomersEffects {
       ),
 
       tap(() => this.router.navigateByUrl('/customers')),
-      map(() => load({ page: 1 }))
+      map(() => customersActions.load({ page: 1 }))
     );
   });
 
   update$ = createEffect(() => {
     return this.actions$.pipe(
-      ofType(update),
+      ofType(customersActions.update),
       concatMap(({ customer }) =>
         this.http
           .put<Customer[]>(this.#baseUrl, customer)
           .pipe(tap(() => this.uiMessage.info('Customer has been updated')))
       ),
-      map(() => load({ page: 1 }))
+      map(() => customersActions.load({ page: 1 }))
     );
   });
 
   remove$ = createEffect(() => {
     return this.actions$.pipe(
-      ofType(remove),
+      ofType(customersActions.remove),
       concatMap(({ customer }) =>
         this.http.delete<Customer[]>(`${this.#baseUrl}/${customer.id}`)
       ),
       tap(() => this.router.navigateByUrl('/customers')),
-      map(() => load({ page: 1 }))
+      map(() => customersActions.load({ page: 1 }))
     );
   });
 

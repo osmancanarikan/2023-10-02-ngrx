@@ -1,6 +1,6 @@
 import { Customer } from '@eternal/customers/model';
 import { createFeature, createReducer, on } from '@ngrx/store';
-import { load, loaded, select, unselect } from './customers.actions';
+import { customersActions } from './customers.actions';
 
 export interface CustomersState {
   customers: Customer[];
@@ -21,13 +21,13 @@ export const customersFeature = createFeature({
   reducer: createReducer<CustomersState>(
     initialState,
     on(
-      load,
+      customersActions.load,
       (state): CustomersState => ({
         ...state,
       })
     ),
     on(
-      loaded,
+      customersActions.loaded,
       (state, { customers, total, page }): CustomersState => ({
         ...state,
         customers,
@@ -36,14 +36,14 @@ export const customersFeature = createFeature({
       })
     ),
     on(
-      select,
+      customersActions.select,
       (state, { id }): CustomersState => ({
         ...state,
         selectedId: id,
       })
     ),
     on(
-      unselect,
+      customersActions.unselect,
       (state): CustomersState => ({
         ...state,
         selectedId: undefined,

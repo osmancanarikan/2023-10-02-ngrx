@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
-import * as actions from '../+state/holidays.actions';
+import { holidaysActions } from '../+state/holidays.actions';
 import { fromHolidays } from '../+state/holidays.selectors';
 import { Holiday } from '@eternal/holidays/model';
 import { HolidayCardComponent } from '@eternal/holidays/ui';
@@ -27,15 +27,15 @@ export class HolidaysComponent implements OnInit {
   constructor(private store: Store) {}
 
   ngOnInit(): void {
-    this.store.dispatch(actions.load());
+    this.store.dispatch(holidaysActions.load());
   }
 
   addFavourite(id: number) {
-    this.store.dispatch(actions.addFavourite({ id }));
+    this.store.dispatch(holidaysActions.addFavourite({ id }));
   }
 
   removeFavourite(id: number) {
-    this.store.dispatch(actions.removeFavourite({ id }));
+    this.store.dispatch(holidaysActions.removeFavourite({ id }));
   }
 
   byId(index: number, holiday: Holiday) {

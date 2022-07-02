@@ -2,7 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { CustomersComponent, CustomersViewModel } from '@eternal/customers/ui';
 import { createSelector, Store } from '@ngrx/store';
-import { select, unselect } from '../+state/customers.actions';
+import { customersActions } from '../+state/customers.actions';
 import { fromCustomers } from '../+state/customers.selectors';
 import { Observable } from 'rxjs';
 
@@ -29,11 +29,11 @@ export class CustomersContainerComponent {
   constructor(private store: Store) {}
 
   setSelected(id: number) {
-    this.store.dispatch(select({ id }));
+    this.store.dispatch(customersActions.select({ id }));
   }
 
   setUnselected() {
-    this.store.dispatch(unselect());
+    this.store.dispatch(customersActions.unselect());
   }
 
   switchPage(page: number) {

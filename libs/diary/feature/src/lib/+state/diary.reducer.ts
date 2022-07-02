@@ -1,5 +1,5 @@
 import { createFeature, createReducer, on } from '@ngrx/store';
-import * as actions from './diary.actions';
+import { diaryActions } from './diary.actions';
 
 export interface Diary {
   id: number;
@@ -36,7 +36,7 @@ export const diaryFeature = createFeature({
   name: 'diary',
   reducer: createReducer<DiaryState>(
     initialState,
-    on(actions.loadSuccess, (state, { diaryResponse }): DiaryState => {
+    on(diaryActions.loadSuccess, (state, { diaryResponse }): DiaryState => {
       const diaryEntries: DiaryEntry[][] = [];
       const diaries: Diary[] = [];
 
@@ -54,7 +54,7 @@ export const diaryFeature = createFeature({
         ),
       };
     }),
-    on(actions.addSuccess, (state, action): DiaryState => {
+    on(diaryActions.addSuccess, (state, action): DiaryState => {
       const { entries, ...diary } = action.diaryWithEntries;
       return {
         ...state,
