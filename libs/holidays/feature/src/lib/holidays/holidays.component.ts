@@ -3,6 +3,8 @@ import { Store } from '@ngrx/store';
 import * as actions from '../+state/holidays.actions';
 import { fromHolidays } from '../+state/holidays.selectors';
 import { Holiday } from '@eternal/holidays/model';
+import { HolidayCardComponent } from '@eternal/holidays/ui';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'eternal-holidays',
@@ -16,6 +18,8 @@ import { Holiday } from '@eternal/holidays/model';
       >
       </eternal-holiday-card>
     </div> `,
+  standalone: true,
+  imports: [CommonModule, HolidayCardComponent],
 })
 export class HolidaysComponent implements OnInit {
   holidays$ = this.store.select(fromHolidays.selectHolidaysWithFavourite);
@@ -37,5 +41,4 @@ export class HolidaysComponent implements OnInit {
   byId(index: number, holiday: Holiday) {
     return holiday.id;
   }
-
 }

@@ -1,14 +1,31 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { UntypedFormGroup } from '@angular/forms';
+import { ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
 import { Customer } from '@eternal/customers/model';
 import { Options } from '@eternal/shared/form';
-import { FormlyFieldConfig } from '@ngx-formly/core';
+import { FormlyFieldConfig, FormlyModule } from '@ngx-formly/core';
 import { formly } from 'ngx-formly-helpers';
+import { MatButtonModule } from '@angular/material/button';
+import { CommonModule } from '@angular/common';
+import { FormlyMatDatepickerModule } from '@ngx-formly/material/datepicker';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'eternal-customer',
   templateUrl: './customer.component.html',
   styleUrls: ['./customer.component.scss'],
+  standalone: true,
+  imports: [
+    ReactiveFormsModule,
+    MatButtonModule,
+    CommonModule,
+    FormlyModule,
+    FormlyMatDatepickerModule,
+    MatDatepickerModule,
+    MatNativeDateModule,
+    RouterModule,
+  ],
 })
 export class CustomerComponent implements OnInit {
   formGroup = new UntypedFormGroup({});

@@ -1,12 +1,23 @@
 import { Component } from '@angular/core';
-import { UntypedFormGroup } from '@angular/forms';
+import { ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
 import { SecurityService } from '@eternal/shared/security';
-import { FormlyFieldConfig } from '@ngx-formly/core';
+import { FormlyFieldConfig, FormlyModule } from '@ngx-formly/core';
 import { formly } from 'ngx-formly-helpers';
+import { CommonModule } from '@angular/common';
+import { FormlyMaterialModule } from '@ngx-formly/material';
+import { MatButtonModule } from '@angular/material/button';
 
 @Component({
   selector: 'eternal-sign-in',
   templateUrl: './sign-in.component.html',
+  standalone: true,
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    FormlyModule,
+    FormlyMaterialModule,
+    MatButtonModule,
+  ],
 })
 export class SignInComponent {
   formGroup = new UntypedFormGroup({});

@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, NgModule } from '@angular/core';
+import { Component } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { RouterModule } from '@angular/router';
 import { SecurityService } from '@eternal/shared/security';
@@ -8,6 +8,8 @@ import { SecurityService } from '@eternal/shared/security';
   selector: 'eternal-sidemenu',
   templateUrl: './sidemenu.component.html',
   styleUrls: ['./sidemenu.component.scss'],
+  standalone: true,
+  imports: [CommonModule, MatButtonModule, RouterModule],
 })
 export class SidemenuComponent {
   loaded$ = this.securityService.getLoaded$();
@@ -15,10 +17,3 @@ export class SidemenuComponent {
 
   constructor(private securityService: SecurityService) {}
 }
-
-@NgModule({
-  imports: [CommonModule, MatButtonModule, RouterModule],
-  declarations: [SidemenuComponent],
-  exports: [SidemenuComponent],
-})
-export class SidemenuComponentModule {}

@@ -64,6 +64,7 @@
     "@nrwl/jest": "14.3.6",
     "@nrwl/linter": "14.3.6",
     "@nrwl/workspace": "14.3.6",
+    "@testing-library/user-event": "^14.2.1",
     "@types/jest": "27.4.1",
     "@types/node": "16.11.7",
     "@typescript-eslint/eslint-plugin": "~5.24.0",

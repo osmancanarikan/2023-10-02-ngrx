@@ -1,11 +1,5 @@
-import {
-  Component,
-  EventEmitter,
-  Input,
-  NgModule,
-  Output,
-} from '@angular/core';
-import { UntypedFormGroup, ReactiveFormsModule } from '@angular/forms';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
 import { MatNativeDateModule } from '@angular/material/core';
 import { FormlyFieldConfig, FormlyModule } from '@ngx-formly/core';
 import { FormlyMatDatepickerModule } from '@ngx-formly/material/datepicker';
@@ -38,6 +32,13 @@ export interface DetailData {
       <ng-content></ng-content>
     </form>
   `,
+  standalone: true,
+  imports: [
+    ReactiveFormsModule,
+    MatNativeDateModule,
+    FormlyModule,
+    FormlyMatDatepickerModule,
+  ],
 })
 export class DetailComponent implements SignUpForm {
   @Input() countries: { label: string; value: string }[] = [];
@@ -65,15 +66,3 @@ export class DetailComponent implements SignUpForm {
     }
   }
 }
-
-@NgModule({
-  declarations: [DetailComponent],
-  exports: [DetailComponent],
-  imports: [
-    ReactiveFormsModule,
-    MatNativeDateModule,
-    FormlyModule,
-    FormlyMatDatepickerModule,
-  ],
-})
-export class DetailComponentModule {}

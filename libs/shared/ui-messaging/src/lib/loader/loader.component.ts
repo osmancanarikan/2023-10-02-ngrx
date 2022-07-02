@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, NgModule } from '@angular/core';
+import { Component } from '@angular/core';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { LoadingService } from './loading.service';
 
@@ -11,14 +11,9 @@ import { LoadingService } from './loading.service';
     }"
     mode="indeterminate"
   ></mat-progress-bar>`,
+  standalone: true,
+  imports: [CommonModule, MatProgressBarModule],
 })
 export class LoaderComponent {
   constructor(public loadingService: LoadingService) {}
 }
-
-@NgModule({
-  imports: [CommonModule, MatProgressBarModule],
-  declarations: [LoaderComponent],
-  exports: [LoaderComponent],
-})
-export class LoaderComponentModule {}

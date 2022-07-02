@@ -1,1 +1,1 @@
-export * from './lib/bookings.module';
+export { bookingsRoutes } from './lib/bookings.routes';

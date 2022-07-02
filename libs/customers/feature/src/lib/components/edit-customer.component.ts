@@ -1,8 +1,8 @@
 import { CommonModule } from '@angular/common';
-import { Component, NgModule } from '@angular/core';
+import { Component } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Customer } from '@eternal/customers/model';
-import { CustomerComponentModule } from '@eternal/customers/ui';
+import { CustomerComponent } from '@eternal/customers/ui';
 import { Options } from '@eternal/shared/form';
 import { fromMaster } from '@eternal/shared/master-data';
 import { Store } from '@ngrx/store';
@@ -20,6 +20,8 @@ import { fromCustomers } from '../+state/customers.selectors';
     (save)="this.submit($event)"
     (remove)="this.remove($event)"
   ></eternal-customer>`,
+  standalone: true,
+  imports: [CommonModule, CustomerComponent],
 })
 export class EditCustomerComponent {
   data$: Observable<{ customer: Customer; countries: Options }>;
@@ -71,10 +73,3 @@ export class EditCustomerComponent {
     return customer$.pipe(filter(customerGuard));
   }
 }
-
-@NgModule({
-  declarations: [EditCustomerComponent],
-  exports: [EditCustomerComponent],
-  imports: [CommonModule, CustomerComponentModule],
-})
-export class EditCustomerComponentModule {}

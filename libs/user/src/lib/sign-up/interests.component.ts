@@ -1,5 +1,5 @@
-import { Component, EventEmitter, NgModule, Output } from '@angular/core';
-import { UntypedFormGroup, ReactiveFormsModule } from '@angular/forms';
+import { Component, EventEmitter, Output } from '@angular/core';
+import { ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
 import { FormlyFieldConfig, FormlyModule } from '@ngx-formly/core';
 import { formly } from 'ngx-formly-helpers';
 
@@ -29,6 +29,8 @@ export interface InterestsData {
       <ng-content></ng-content>
     </form>
   `,
+  standalone: true,
+  imports: [ReactiveFormsModule, FormlyModule],
 })
 export class InterestsComponent {
   @Output() next = new EventEmitter<InterestsData>();
@@ -83,10 +85,3 @@ export class InterestsComponent {
     }
   }
 }
-
-@NgModule({
-  declarations: [InterestsComponent],
-  imports: [ReactiveFormsModule, FormlyModule],
-  exports: [InterestsComponent],
-})
-export class InterestsComponentModule {}

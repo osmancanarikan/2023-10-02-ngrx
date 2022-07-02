@@ -1,2 +1,2 @@
-export { SharedMasterDataModule } from './lib/shared-master-data.module';
+export { sharedMasterDataProvider } from './lib/shared-master-data.provider';
 export { fromMaster, masterFeature } from './lib/+state/master.reducer';

@@ -5,7 +5,6 @@ import {
   HttpTestingController,
 } from '@angular/common/http/testing';
 import { HolidaysComponent } from './holidays.component';
-import { HolidaysComponentModule } from './holidays.component.module';
 import { StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
 import { holidaysFeature } from '../+state/holidays.reducer';
@@ -17,7 +16,7 @@ describe('Request Info Component', () => {
   const setup = async () =>
     render(HolidaysComponent, {
       imports: [
-        HolidaysComponentModule,
+        HolidaysComponent,
         StoreModule.forRoot({}),
         EffectsModule.forRoot([]),
         StoreModule.forFeature(holidaysFeature),
