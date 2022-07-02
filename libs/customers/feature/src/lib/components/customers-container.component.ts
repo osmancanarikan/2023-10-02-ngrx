@@ -3,7 +3,7 @@ import { Component } from '@angular/core';
 import { CustomersComponent, CustomersViewModel } from '@eternal/customers/ui';
 import { createSelector, Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
-import { customersActions, fromCustomers } from '@eternal/customers/data';
+import { CustomersRepository, fromCustomers } from '@eternal/customers/data';
 
 @Component({
   template: ` <eternal-customers
@@ -25,14 +25,17 @@ export class CustomersContainerComponent {
     }))
   );
 
-  constructor(private store: Store) {}
+  constructor(
+    private customersRepository: CustomersRepository,
+    private store: Store
+  ) {}
 
   setSelected(id: number) {
-    this.store.dispatch(customersActions.select({ id }));
+    this.customersRepository.select(id);
   }
 
   setUnselected() {
-    this.store.dispatch(customersActions.unselect());
+    this.customersRepository.unselect();
   }
 
   switchPage(page: number) {

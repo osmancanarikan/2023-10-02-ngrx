@@ -1,11 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { Store } from '@ngrx/store';
-import { filter } from 'rxjs';
 import { bookingsActions } from '../+state/bookings.actions';
 import { Booking } from '../+state/bookings.reducer';
-import { fromBookings } from '../+state/bookings.selectors';
 import { CommonModule } from '@angular/common';
+import { BookingsRepository } from '../+state/bookings-repository.service';
 
 @Component({
   selector: 'eternal-overview',
@@ -18,19 +17,19 @@ export class OverviewComponent implements OnInit {
   displayedColumns = ['holidayId', 'date', 'status', 'comment'];
   dataSource = new MatTableDataSource<Booking>([]);
 
-  constructor(private store: Store) {}
+  constructor(
+    private store: Store,
+    private bookingsRepository: BookingsRepository
+  ) {}
 
   ngOnInit(): void {
-    this.store
-      .select(fromBookings.selectBookingData)
-      .pipe(filter(Boolean))
-      .subscribe((bookingData) => {
-        if (bookingData?.loaded === false) {
-          this.store.dispatch(bookingsActions.load());
-        } else {
-          this.userName = bookingData.customerName;
-          this.dataSource.data = bookingData.bookings;
-        }
-      });
+    this.bookingsRepository.bookingsData$.subscribe((bookingData) => {
+      if (bookingData?.loaded === false) {
+        this.store.dispatch(bookingsActions.load());
+      } else {
+        this.userName = bookingData.customerName;
+        this.dataSource.data = bookingData.bookings;
+      }
+    });
   }
 }
