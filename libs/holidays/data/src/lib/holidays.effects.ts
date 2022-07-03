@@ -2,13 +2,27 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Holiday } from '@eternal/holidays/model';
 import { Configuration } from '@eternal/shared/config';
-import { Actions, createEffect, ofType } from '@ngrx/effects';
-import { concatMap, map, switchMap } from 'rxjs/operators';
+import { Actions, concatLatestFrom, createEffect, ofType } from '@ngrx/effects';
+import { concatMap, filter, map, switchMap } from 'rxjs/operators';
 import { holidaysActions } from './holidays.actions';
+import { holidaysFeature } from './holidays.reducer';
+import { Store } from '@ngrx/store';
 
 @Injectable()
 export class HolidaysEffects {
   #baseUrl = '/holiday';
+
+  get$ = createEffect(() => {
+    return this.actions$.pipe(
+      ofType(holidaysActions.get),
+      concatLatestFrom(() =>
+        this.store.select(holidaysFeature.selectLoadStatus)
+      ),
+      filter(([, loadStatus]) => loadStatus === 'not loaded'),
+      map(() => holidaysActions.load())
+    );
+  });
+
   load$ = createEffect(() => {
     return this.actions$.pipe(
       ofType(holidaysActions.load),
@@ -48,6 +62,7 @@ export class HolidaysEffects {
   constructor(
     private actions$: Actions,
     private httpClient: HttpClient,
-    private config: Configuration
+    private config: Configuration,
+    private store: Store
   ) {}
 }
