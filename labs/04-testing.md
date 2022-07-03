@@ -27,17 +27,20 @@ Write two unit tests for the `init` action and verify that there is a change in 
 _customers.reducer.spec.ts_
 
 ```typescript
-describe("Customer Reducer", () => {
-  describe("init", () => {
+import { customersFeature, initialState } from './customers.reducer';
+import { customersActions } from './customers.actions';
+
+describe('Customer Reducer', () => {
+  describe('init', () => {
     it("shouldn't do aynthing when state has no error", () => {
       const state = initialState;
-      const newState = customersFeature.reducer(state, init());
+      const newState = customersFeature.reducer(state, customersActions.init());
       expect(state).toBe(newState);
     });
 
-    it("should remove the error when state has an error", () => {
+    it('should remove the error when state has an error', () => {
       const state = { ...initialState, hasError: true };
-      const newState = customersFeature.reducer(state, init());
+      const newState = customersFeature.reducer(state, customersActions.init());
       expect(newState.hasError).toBe(false);
     });
   });
@@ -58,11 +61,11 @@ Write a unit test for the parameterised selector `selectById`. You can use `crea
 _customers.selectors.spec.ts_
 
 ```typescript
-import { fromCustomers } from "./customers.selectors";
-import { createCustomer, createCustomers } from "@eternal/customers/model";
+import { fromCustomers } from './customers.selectors';
+import { createCustomer, createCustomers } from '@eternal/customers/model';
 
-describe("Customers Selectors", () => {
-  it("should select a customer by id", () => {
+describe('Customers Selectors', () => {
+  it('should select a customer by id', () => {
     const firstCustomer = createCustomer({ id: 1 });
     const customers = createCustomers(firstCustomer, createCustomer({ id: 2 }));
     expect(fromCustomers.selectById(1).projector(customers)).toEqual(
@@ -87,11 +90,11 @@ Next, test the selector `selectSelectedCustomer`. You can pass multiple values t
 _customers.selectors.spec.ts_
 
 ```typescript
-it("should select selected customer", () => {
+it('should select selected customer', () => {
   const tanjaLudwig = createCustomer({
     id: 2,
-    firstname: "Tanja",
-    name: "Ludwig",
+    firstname: 'Tanja',
+    name: 'Ludwig',
   });
   const customers = createCustomers(createCustomer({ id: 1 }), tanjaLudwig);
   expect(fromCustomers.selectSelectedCustomer.projector(customers, 2)).toEqual(
@@ -116,18 +119,18 @@ Write another one for the opposite case, i.e. the effect should dispatch the `ge
 _customers.effects.spec.ts_
 
 ```typescript
-import { Action, Store } from "@ngrx/store";
-import { customersFeature } from "./customers.reducer";
-import { firstValueFrom, Observable, of } from "rxjs";
-import { CustomersEffects } from "./customers.effects";
-import * as customersActions from "./customers.actions";
-import { createMock, Mock } from "@testing-library/angular/jest-utils";
-import { HttpClient } from "@angular/common/http";
-import { Router } from "@angular/router";
-import { Configuration } from "@eternal/shared/config";
-import { MessageService } from "@eternal/shared/ui-messaging";
+import { Action, Store } from '@ngrx/store';
+import { customersFeature } from './customers.reducer';
+import { firstValueFrom, Observable, of } from 'rxjs';
+import { CustomersEffects } from './customers.effects';
+import { customersActions } from './customers.actions';
+import { createMock, Mock } from '@testing-library/angular/jest-utils';
+import { HttpClient } from '@angular/common/http';
+import { Router } from '@angular/router';
+import { Configuration } from '@eternal/shared/config';
+import { MessageService } from '@eternal/shared/ui-messaging';
 
-describe("Customer Effects", () => {
+describe('Customer Effects', () => {
   let httpClient: Mock<HttpClient>;
   let store: Mock<Store>;
   let configuration: Mock<Configuration>;
@@ -152,8 +155,8 @@ describe("Customer Effects", () => {
       messageService
     );
 
-  describe("init", () => {
-    it("should  dispatch get if not loaded", async () => {
+  describe('init', () => {
+    it('should  dispatch get if not loaded', async () => {
       store.select.mockImplementation((selector) => {
         expect(selector).toBe(customersFeature.selectIsLoaded);
         return of(false);
@@ -166,7 +169,7 @@ describe("Customer Effects", () => {
       );
     });
 
-    it("should dispatch nothing if already loaded", async () => {
+    it('should dispatch nothing if already loaded', async () => {
       store.select.mockImplementation((selector) => {
         expect(selector).toBe(customersFeature.selectIsLoaded);
         return of(true);
@@ -198,20 +201,20 @@ _customers.effects.spec.ts_
 
 ```typescript
 it(
-  "should load with the right parameters",
+  'should load with the right parameters',
   marbles((m) => {
-    const actions$ = m.cold("---a", {
+    const actions$ = m.cold('---a', {
       a: customersActions.load({ page: 2 }),
     });
     const customer = createCustomer();
     httpClient.get.mockImplementation((url, { params }) => {
-      expect(url).toBe("/customers");
-      expect(params).toEqual(new HttpParams().set("page", 2));
-      return m.cold("r", { r: { content: [customer], total: 11 } });
+      expect(url).toBe('/customers');
+      expect(params).toEqual(new HttpParams().set('page', 2));
+      return m.cold('r', { r: { content: [customer], total: 11 } });
     });
     const effect = createEffect(actions$);
 
-    m.expect(effect.load$).toBeObservable("---b", {
+    m.expect(effect.load$).toBeObservable('---b', {
       b: customersActions.loadSuccess({
         customers: [customer],
         total: 11,
@@ -239,9 +242,9 @@ _customers.effects.spec.ts_
 
 ```typescript
 it(
-  "should not load in parallel",
+  'should not load in parallel',
   marbles((m) => {
-    const actions$ = m.cold("100ms a 100ms b 100ms c", {
+    const actions$ = m.cold('100ms a 100ms b 100ms c', {
       a: customersActions.load({ page: 1 }),
       b: customersActions.load({ page: 2 }),
       c: customersActions.load({ page: 3 }),
@@ -250,19 +253,19 @@ it(
     const customers = [
       createCustomer(),
       createCustomer(),
-      createCustomer({ firstname: "User 3" }),
+      createCustomer({ firstname: 'User 3' }),
     ].reverse();
     const [lastCustomer] = customers;
 
     httpClient.get.mockImplementation(() => {
-      return m.cold("200ms r", {
+      return m.cold('200ms r', {
         r: { content: [customers.pop()], total: 20 },
       });
     });
 
     const effect = createEffect(actions$);
 
-    m.expect(effect.load$).toBeObservable("502ms b", {
+    m.expect(effect.load$).toBeObservable('502ms b', {
       b: customersActions.loadSuccess({
         customers: [lastCustomer],
         total: 20,
@@ -284,7 +287,7 @@ The syntax for the `httpClient` would be:
 
 ```typescript
 httpClient.get.mockImplementation(() => {
-  return m.cold("#", {}, new Error());
+  return m.cold('#', {}, new Error());
 });
 ```
 
@@ -296,18 +299,18 @@ _customers.effects.spec.ts_
 
 ```typescript
 it(
-  "should dispatch loadFailure on error",
+  'should dispatch loadFailure on error',
   marbles((m) => {
-    const actions$ = m.cold("l", {
+    const actions$ = m.cold('l', {
       l: customersActions.load({ page: 1 }),
     });
     httpClient.get.mockImplementation(() => {
-      return m.cold("#", {}, new Error());
+      return m.cold('#', {}, new Error());
     });
 
     const effect = createEffect(actions$);
 
-    m.expect(effect.load$).toBeObservable("a", {
+    m.expect(effect.load$).toBeObservable('a', {
       a: customersActions.loadFailure(),
     });
   })
@@ -326,39 +329,37 @@ We write one test file which covers the complete `customers-data` module and use
 In `customers-data`, create a new file `customers-data.integration.spec.ts` and add following code to it:
 
 ```typescript
-import { TestBed } from "@angular/core/testing";
-import { StoreModule } from "@ngrx/store";
-import { EffectsModule } from "@ngrx/effects";
+import { TestBed } from '@angular/core/testing';
+import { StoreModule } from '@ngrx/store';
+import { EffectsModule } from '@ngrx/effects';
 import {
   HttpClientTestingModule,
   HttpTestingController,
-} from "@angular/common/http/testing";
-import {
-  CustomersDataModule,
-  CustomersRepository,
-} from "@eternal/customers/data";
-import { Router } from "@angular/router";
-import { provideMock } from "@testing-library/angular/jest-utils";
-import { Configuration } from "@eternal/shared/config";
-import { MatDialogModule } from "@angular/material/dialog";
-import { firstValueFrom } from "rxjs";
-import { createCustomers } from "@eternal/customers/model";
+} from '@angular/common/http/testing';
+import { CustomersRepository } from '@eternal/customers/data';
+import { Router } from '@angular/router';
+import { provideMock } from '@testing-library/angular/jest-utils';
+import { Configuration } from '@eternal/shared/config';
+import { MatDialogModule } from '@angular/material/dialog';
+import { customersFeature } from './customers.reducer';
+import { CustomersEffects } from './customers.effects';
 
-describe("Customers Data", () => {
+describe('Customers Data', () => {
   const setup = () => {
     TestBed.configureTestingModule({
       imports: [
         StoreModule.forRoot({}),
         EffectsModule.forRoot([]),
+        StoreModule.forFeature(customersFeature),
+        EffectsModule.forFeature([CustomersEffects]),
         HttpClientTestingModule,
-        CustomersDataModule,
         MatDialogModule,
       ],
       providers: [
         provideMock(Router),
         {
           provide: Configuration,
-          useValue: new Configuration("https:///www.host.com"),
+          useValue: new Configuration('https:///www.host.com'),
         },
       ],
     });
@@ -369,7 +370,7 @@ describe("Customers Data", () => {
     return { repository, httpCtrl };
   };
 
-  it("should instantiate", () => {
+  it('should instantiate', () => {
     setup();
   });
 });
@@ -386,13 +387,13 @@ Add a test that calls `CustomersRepository:get` and assert the `pagedCustomers$`
 <p>
 
 ```typescript
-it("should load customers", async () => {
+it('should load customers', async () => {
   const { repository, httpCtrl } = setup();
   const customers = createCustomers({}, {});
 
   repository.get(1);
   httpCtrl
-    .expectOne("/customers?page=1")
+    .expectOne('/customers?page=1')
     .flush({ content: customers, page: 1, total: 30 });
   const pagedCustomers = await firstValueFrom(repository.pagedCustomers$);
 
@@ -419,13 +420,13 @@ Simulate a failed HTTP request. You can trigger an HTTP error via `httpCtrl.expe
 <p>
 
 ```typescript
-it("should show an error", async () => {
+it('should show an error', async () => {
   const { repository, httpCtrl } = setup();
 
   repository.get(-1);
   httpCtrl
-    .expectOne("/customers?page=-1")
-    .flush("", { status: 502, statusText: "Bad Gateway" });
+    .expectOne('/customers?page=-1')
+    .flush('', { status: 502, statusText: 'Bad Gateway' });
   const pagedCustomers = await firstValueFrom(repository.pagedCustomers$);
 
   expect(pagedCustomers).toEqual({
@@ -440,9 +441,9 @@ it("should show an error", async () => {
 </p>
 </details>
 
-# 2. Bonus
+# 3. Bonus
 
-# 2.1. Redirection in `add`
+# 3.1. Redirection in `add`
 
 Write a marble test, that asserts that a redirection happens in the handling of the `add` action.
 
@@ -453,15 +454,15 @@ Write a marble test, that asserts that a redirection happens in the handling of 
 _customers.effects.spec.ts_
 
 ```typescript
-describe("add$", () => {
-  it("should redirect to /customers", () => {
+describe('add$', () => {
+  it('should redirect to /customers', () => {
     const actions$ = of(customersActions.add({ customer: createCustomer() }));
     const effect = createEffect(actions$);
     httpClient.post.mockReturnValue(of(true));
 
     effect.add$.subscribe();
 
-    expect(router.navigateByUrl).toHaveBeenCalledWith("/customers");
+    expect(router.navigateByUrl).toHaveBeenCalledWith('/customers');
   });
 });
 ```
@@ -470,14 +471,14 @@ describe("add$", () => {
 </details>
 
 ```typescript
-it("should load holidays", async () => {
+it('should load holidays', async () => {
   const holidays = createHolidays(
-    { title: "Pyramids" },
-    { title: "Tower Bridge" }
+    { title: 'Pyramids' },
+    { title: 'Tower Bridge' }
   );
 
   store.dispatch(get());
-  httpCtrl.expectOne("/holiday").flush(holidays);
+  httpCtrl.expectOne('/holiday').flush(holidays);
 
   expect(await firstValueFrom(store.select(fromHolidays.get))).toEqual(
     holidays.map((holiday) => ({
@@ -489,6 +490,6 @@ it("should load holidays", async () => {
 });
 ```
 
-# 2.2. Improve customers cache by TDD
+# 3.2. Improve customers cache by TDD
 
 If we dispatch `get` with page 0, then no request is sent. This is because, the default page value is 0. You have a working integration test "should show an error" in _customers-data.integration.spec.ts_. Update that test, so that page is 0 instead of -1 and make sure that the loading takes place.
