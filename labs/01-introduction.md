@@ -26,52 +26,59 @@ Run the linter afterwards, to verify that everything is alright.
 Generate a data library with
 
 ```bash
-npx nx g lib data --directory customers
+npx nx g @nrwl/angular:library data --directory customers
 ```
+
+Remove the generated NgModule. We are on standalone.
 
 **2. Move files**
 
 Move all NgRx files from `customers-feature` (directory +state) to the newly generated library `customers-data`. Use your IDE for that. It should automatically update the imports.
 
-**3. Import NgRx modules in `customers-data`**
+**3. Provide the NgRx modules in `customers-data`**
 
-The newly created CustomerDataModule should be responsible to import the `[Store|Effects]Module` and setup the state. Move them from `CustomerFeatureModule` to `CustomerDataModule`.
+The newly created `customers-data` should be responsible to provide and setup the `[Store|Effects]Module`. Move them over from `customers-feature`.
 
-_customers-data: customers-data.module.ts_
+_customers-data: customers-data.provider.ts_
 
 ```typescript
-import { NgModule } from "@angular/core";
-import { CommonModule } from "@angular/common";
-import { StoreModule } from "@ngrx/store";
-import { customersFeature } from "./customers.reducer";
-import { EffectsModule } from "@ngrx/effects";
-import { CustomersEffects } from "./customers.effects";
+import { importProvidersFrom } from '@angular/core';
+import { CustomersEffects } from './customers.effects';
+import { EffectsModule } from '@ngrx/effects';
+import { StoreModule } from '@ngrx/store';
+import { customersFeature } from './customers.reducer';
 
-@NgModule({
-  imports: [
-    CommonModule,
-    StoreModule.forFeature(customersFeature),
-    EffectsModule.forFeature([CustomersEffects]),
-  ],
-})
-export class CustomersDataModule {}
+export const customersDataProvider = importProvidersFrom(
+  StoreModule.forFeature(customersFeature),
+  EffectsModule.forFeature([CustomersEffects])
+);
+```
+
+_customers-data: index.ts_
+
+```typescript
+export { customersDataProvider } from './lib/customers-data.provider';
 ```
 
 **4. Dependency `customers-feature` -> `customers-data`**
 
-`customers-feature`: _customers-feature.module.ts_
+`customers-feature`: _customers.routes.ts_
 
 ```typescript
-@NgModule({
-  imports: [
-    // existing imports
-    CustomersDataModule, // <- add this
-  ],
-})
-export class CustomersFeatureModule {}
+export const customersRoutes: Routes = [
+  {
+    path: '',
+    canActivate: [DataGuard],
+    component: CustomersRootComponent,
+    providers: [customersDataProvider], // <-- updated providers property
+    children: [
+      // ...
+    ],
+  },
+];
 ```
 
-**5. Verify app**
+**5. Verify the app**
 
 Run `npx nx serve` and verify that the app is still working.
 
@@ -81,25 +88,20 @@ Run `npx nx affected:lint`. It should fail with a lots of **@nrwl/nx/enforce-mod
 
 **7. Dependency rules**
 
-To tag the project, open _project.json_ in `customer-data`. Scroll down to the `tags` property and set the following value `["domain:customers", "type:data"]`.
+To tag the project, open _project.json_ in `customers-data`. Scroll down to the `tags` property and set the following value `["domain:customers", "type:data"]`.
 
 **8. Deep imports**
 
-The other error in the linting is because we have deep imports. To fix that, open the _index.ts_ of `customer-data`and add ONLY the classes and functions you want to expose.
+The other error in the linting is because we have deep imports. To fix that, open the _index.ts_ of `customers-data`and add ONLY the classes and functions you want to expose.
 
 ```typescript
-import {
-  add,
-  load,
-  remove,
-  select,
-  unselect,
-  update,
-} from "./lib/customers.actions";
+import { customersActions as allCustomersActions } from './lib/customers.actions';
 
-export { CustomersDataModule } from "./lib/customers-data.module";
+const { add, load, remove, select, unselect, update } = allCustomersActions;
+
 export const customersActions = { load, add, update, remove, select, unselect };
-export { fromCustomers } from "./lib/customers.selectors";
+export { fromCustomers } from './lib/customers.selectors';
+export { customersDataProvider } from './lib/customers-data.provider';
 ```
 
 **9. Update container components**
@@ -113,7 +115,7 @@ We're almost done. Update the container components and the data guard in `custom
 
 **10. Final check**
 
-Finally, run `npx nx run-many --target lint --all` to verify the codebase doesn't break any rules.
+Finally, run `npx nx affected:lint` to verify the codebase doesn't break any rules.
 
 </p>
 </details>
