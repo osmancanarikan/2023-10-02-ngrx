@@ -13,12 +13,12 @@
 
 The bookings module has a dependency to customers. Open _bookings.effects.ts_ and _bookings.selectors.ts_ in `bookings`. You'll find an import of the selector `selectSelectedCustomer`.
 
-That violates our dependency rules. The linter didn't report it, because we cheated 😅 and disabled eslint for these parts.
+That violates our dependency rules. The linter didn't report it, because we cheated 😅 and disabled eslint for that line.
 
 Create a new library `customers-api` which only exposes the `selectSelectedCustomer` selector from `customers-api`.
 
-1. Create a dependency from `bookings` to `customer-api` and
-2. setup the rules in _/eslint.json_ and
+1. Create a dependency from `bookings` to `customer-api`,
+2. setup the rules in _/eslint.json_, and
 3. tag the two projects appropriately.
 
 <details>
@@ -27,21 +27,21 @@ Create a new library `customers-api` which only exposes the `selectSelectedCusto
 
 **1. Create `customers-api`**
 
-Run `npx nx g lib api --directory customers --skip-module`.
+Run `npx nx g @nrwl/angular:library api --directory customers --skip-module`.
 
 We only need to export the selector in the _index.ts_ of `customers-api`:
 
 ```typescript
-import { fromCustomers } from "@eternal/customers/data";
+import { fromCustomers } from '@eternal/customers/data';
 
 export const selectSelectedCustomer = fromCustomers.selectSelectedCustomer;
 ```
 
-We can now also remove the export of the `selectSelectedCustomer` from `customers-feature`. It should only export `CustomersFeatureModule`.
+We can now also remove the export of the `selectSelectedCustomer` in `customers-feature`. It should only export `customersRoutes`.
 
 **2. `bookings` -> `customer-api`**
 
-Update the imports in in _booking.effects.ts_ and _booking.selectors.ts_ so that they import from `customers-api`.
+Update the imports in _booking.effects.ts_ and _booking.selectors.ts_ so that they import from `customers-api`.
 
 **3. Tag `customers-api`**
 
@@ -106,29 +106,29 @@ Open _/eslintrc.json_. We have to deal with four rules.
 
 ## 2. Repository
 
-In order to simplify the usage of NgRx, we are going to hide it 😃. We apply the facade/repository pattern. One version to use inside the customers and one for the outside via the `customers-api`.
+In order to simplify the usage of NgRx, we are going to hide it 😃. We apply the facade/repository pattern. One internal version internal and for the outside of customers via the `customers-api`.
 
 ### 2.1 Internal
 
 1. Create a service `CustomersRepository` which exposes the public actions as simple methods and the selectors as properties.
-2. Make sure that `customers-data` only exposes that service and the `CustomersDataModule`.
+2. Make sure that `customers-data` only exposes that `CustomersRepository` and the `customersDataProvider`.
 3. Use the repository in the container components and the data guard of `customers-feature`.
 
 <details>
 <summary>Show Solution</summary>
 <p>
 
-**1. Create repository and encapsulate actions**
+**1. Create a repository and encapsulate actions**
 
 Create a new service _customers-repository.service.ts_ in `customers-data`:
 
 ```typescript
-import { Injectable } from "@angular/core";
-import { Store } from "@ngrx/store";
-import * as customersActions from "./customers.actions";
-import { Customer } from "@eternal/customers/model";
+import { Injectable } from '@angular/core';
+import { Store } from '@ngrx/store';
+import { customersActions } from './customers.actions';
+import { Customer } from '@eternal/customers/model';
 
-@Injectable({ providedIn: "root" })
+@Injectable({ providedIn: 'root' })
 export class CustomersRepository {
   constructor(private store: Store) {}
 
@@ -161,7 +161,7 @@ export class CustomersRepository {
 **2. Add selectors as properties**
 
 ```typescript
-@Injectable({ providedIn: "root" })
+@Injectable({ providedIn: 'root' })
 export class CustomersRepository {
   readonly customers$: Observable<Customer[]> = this.store.select(
     fromCustomers.selectCustomers
@@ -186,7 +186,9 @@ export class CustomersRepository {
 }
 ```
 
-**3. Update the container components, data guard and \*index.ts\* of `customers-data`**
+**3. Update the container components, data guard and \*index.ts\* of `customers-feature`**
+
+Take a look at the selector generated in `CustomersContainerComponent`. Does it make sense to create a selector in a container component when we just placed the complete NgRx behind a repository?
 
 </p>
 </details>
@@ -195,11 +197,11 @@ export class CustomersRepository {
 
 We can't expose the `CustomersRepository` to external domains like booking. It's much too powerful. Therefore, create a minimal version which only exposes the selector.
 
-There are two possibilities. If you want to completely hide NgRx from the rest of your application, you cannot export the selector but a repository-like service. As a consequence the _booking.selectors.ts_ will not work anymore and you have to fallback to `combinateLatest`. The other possibility would be that the `customers-api` exposes the selector.
+There are two possibilities. If you want to completely hide NgRx from the rest of your application, you cannot export the selector, but need a repository-like service. As a consequence, _booking.selectors.ts_ will not work anymore, and you have to fallback to `combinateLatest`. The other possibility would be that the `customers-api` exposes the selector.
 
 You have to choose between better architecture and NgRx performance. If you favour NgRx performance, you will have to expose `selectSelectedCustomer` from `customers-api`.
 
-The solutions show the other approach.
+The solutions show the second approach, where architecture is favoured over performance.
 
 <details>
 <summary>Solution: Hiding the NgRx Selector</summary>
@@ -210,13 +212,13 @@ The solutions show the other approach.
 Create a new file _customers-api.service.ts_ in `customers-api`:
 
 ```typescript
-import { Injectable } from "@angular/core";
-import { CustomersRepository } from "@eternal/customers/data";
-import { Observable } from "rxjs";
-import { Customer } from "@eternal/customers/model";
+import { Injectable } from '@angular/core';
+import { CustomersRepository } from '@eternal/customers/data';
+import { Observable } from 'rxjs';
+import { Customer } from '@eternal/customers/model';
 
 @Injectable({
-  providedIn: "root",
+  providedIn: 'root',
 })
 export class CustomersApi {
   readonly selectedCustomer$: Observable<Customer | undefined> =
@@ -238,15 +240,17 @@ The _index.ts_ in `customers-api` only exposes the `CustomersApi`. The selector 
 export class BookingsEffects {
   constructor(private actions$: Actions, private customersApi: CustomersApi) {}
 
-  load$ = createEffect(() =>
-    this.actions$.pipe(
-      ofType(load),
+  load$ = createEffect(() => {
+    return this.actions$.pipe(
+      ofType(bookingsActions.load),
       concatLatestFrom(() => this.customersApi.selectedCustomer$), // ← replace with this
       map(([, customerId]) => customerId),
       filter(Boolean),
-      map((customer) => loaded({ bookings: bookings.get(customer.id) || [] }))
-    )
-  );
+      map((customer) =>
+        bookingsActions.loaded({ bookings: bookings.get(customer.id) || [] })
+      )
+    );
+  });
 }
 ```
 
@@ -255,12 +259,12 @@ export class BookingsEffects {
 Create a new file _bookings-repository.service.ts_:
 
 ```typescript
-import { combineLatest, filter, map, Observable } from "rxjs";
-import { Booking, bookingsFeature } from "./bookings.reducer";
-import { assertDefined, isDefined } from "@eternal/shared/util";
-import { Injectable } from "@angular/core";
-import { Store } from "@ngrx/store";
-import { CustomersApi } from "@eternal/customers/api";
+import { combineLatest, filter, map, Observable } from 'rxjs';
+import { Booking, bookingsFeature } from './bookings.reducer';
+import { assertDefined, isDefined } from '@eternal/shared/util';
+import { Injectable } from '@angular/core';
+import { Store } from '@ngrx/store';
+import { CustomersApi } from '@eternal/customers/api';
 
 interface BookingData {
   bookings: Booking[];
@@ -268,9 +272,9 @@ interface BookingData {
   loaded: boolean;
 }
 
-@Injectable({ providedIn: "root" })
+@Injectable({ providedIn: 'root' })
 export class BookingsRepository {
-  readonly bookingData$: Observable<BookingData> = combineLatest({
+  readonly bookingsData$: Observable<BookingData> = combineLatest({
     customer: this.customersApi.selectedCustomer$,
     bookings: this.store.select(bookingsFeature.selectBookings),
     loaded: this.store.select(bookingsFeature.selectLoaded),
@@ -279,7 +283,7 @@ export class BookingsRepository {
     map(({ customer, bookings, loaded }) => {
       assertDefined(customer);
       return {
-        customerName: customer.name + ", " + customer.firstname,
+        customerName: customer.name + ', ' + customer.firstname,
         bookings,
         loaded,
       };
@@ -305,7 +309,7 @@ export class OverviewComponent implements OnInit {
 
   ngOnInit(): void {
     // ↓ replace with this
-    this.bookingsRepository.bookingData$.subscribe((bookingData) => {
+    this.bookingsRepository.bookingsData$.subscribe((bookingData) => {
       if (bookingData?.loaded === false) {
         this.store.dispatch(load());
       } else {
@@ -336,7 +340,7 @@ Make use of the RxJs operators `filterDefined` and `clone` from `shared-ngrx-uti
 _customers-repository.service.ts_
 
 ```typescript
-@Injectable({ providedIn: "root" })
+@Injectable({ providedIn: 'root' })
 export class CustomersRepository {
   readonly customers$: Observable<Customer[]> = this.store
     .select(fromCustomers.selectCustomers)
@@ -373,7 +377,7 @@ Make sure to update _edit-customer.component.ts_ and _customers-api.services.ts_
 
 Another "hard to decide" trade-off. We have one state structure but multiple view structures, aka. view models. Usually, selectors do the mapping because of their caching capabilities.
 
-Looking at the situation from an architectural's perspecitve, we want to limit the knowledge of state management about our UI models. Vice versa it is the same. That definitely makes sense, when the mapping to a view model requires dependency injection, advanced operators (filter, async), and another alien feature state.
+Looking at the situation from an architecture's perspective, we want to limit the knowledge of state management about our UI models. It is the same vice versa. That definitely makes sense, when the mapping to a view model requires dependency injection, advanced operators (filter, async), and another alien feature state.
 
 Split up the bookings overview into a container and a presentational component. The presentational component should define its own view model, the container component should combine `CustomerApi` with `BookingRepository` to construct that view model. As a consequence, `BookingRepository` provides only the bookings selectors `bookings$` and `loaded$`.
 
@@ -383,7 +387,7 @@ Split up the bookings overview into a container and a presentational component. 
 
 **1. Presentational component**
 
-Rename `OverviewComponent` into `OverviewContainerComponent` and update the folder and file names. Update `bookings-module.ts` as well. After that, create the actual presentational component:
+Rename `OverviewComponent` into `OverviewContainerComponent` and update the folder and file names. Update `bookings-routes.ts` as well. After that, create the actual presentational component:
 
 ```bash
 # This generates a single component and a single NgModule (=SCAM)
@@ -393,9 +397,10 @@ npx nx g scam overview --project bookings --inline-style --skip-tests --export f
 _overview.component.ts_
 
 ```typescript
-import { Component, Input } from "@angular/core";
-import { Booking } from "../+state/bookings.reducer";
-import { MatTableDataSource } from "@angular/material/table";
+import { Component, Input } from '@angular/core';
+import { Booking } from '../+state/bookings.reducer';
+import { MatTableDataSource, MatTableModule } from '@angular/material/table';
+import { CommonModule } from '@angular/common';
 
 export interface ViewModel {
   bookings: Booking[];
@@ -403,12 +408,14 @@ export interface ViewModel {
 }
 
 @Component({
-  selector: "eternal-overview",
-  templateUrl: "./overview.component.html",
+  selector: 'eternal-overview',
+  templateUrl: './overview.component.html',
+  standalone: true,
+  imports: [MatTableModule, CommonModule],
 })
 export class OverviewComponent {
   @Input() viewModel: ViewModel | undefined;
-  displayedColumns = ["holidayId", "date", "status", "comment"];
+  displayedColumns = ['holidayId', 'date', 'status', 'comment'];
   dataSource = new MatTableDataSource<Booking>([]);
 }
 ```
@@ -450,36 +457,20 @@ _overview.component.html_
 </ng-container>
 ```
 
-_overview.component.module.ts_
-
-```typescript
-import { NgModule } from "@angular/core";
-import { OverviewComponent } from "./overview.component";
-import { MatTableModule } from "@angular/material/table";
-import { CommonModule } from "@angular/common";
-
-@NgModule({
-  declarations: [OverviewComponent],
-  exports: [OverviewComponent],
-  imports: [MatTableModule, CommonModule],
-})
-export class OverviewComponentModule {}
-```
-
 **2. Modify `BookingsRepository`**
 
-The repository doesn't incooperate the `CustomerApi` anymore:
+The repository doesn't need to use the `CustomerApi` anymore:
 
 _bookings-repository.service.ts_
 
 ```typescript
-import { Observable } from "rxjs";
-import { Booking, bookingsFeature } from "./bookings.reducer";
-import { Injectable } from "@angular/core";
-import { Store } from "@ngrx/store";
-import * as bookingsActions from "./bookings.actions";
+import { Observable } from 'rxjs';
+import { Booking, bookingsFeature } from './bookings.reducer';
+import { Injectable } from '@angular/core';
+import { Store } from '@ngrx/store';
+import * as bookingsActions from './bookings.actions';
 
-@Injectable({ providedIn: "root" })
+@Injectable({ providedIn: 'root' })
 export class BookingsRepository {
   readonly bookings$: Observable<Booking[]> = this.store.select(
     bookingsFeature.selectBookings
@@ -502,10 +493,10 @@ The container component for overview is responsible for setting up the view mode
 _overview-container-component.module.ts_
 
 ```typescript
-import { CommonModule } from "@angular/common";
-import { NgModule } from "@angular/core";
-import { OverviewContainerComponent } from "./overview-container.component";
-import { OverviewComponentModule } from "../overview/overview.component.module";
+import { CommonModule } from '@angular/common';
+import { NgModule } from '@angular/core';
+import { OverviewContainerComponent } from './overview-container.component';
+import { OverviewComponentModule } from '../overview/overview.component.module';
 
 @NgModule({
   declarations: [OverviewContainerComponent],
@@ -518,18 +509,22 @@ export class OverviewContainerComponentModule {}
 _overview-container.component.ts_
 
 ```typescript
-import { Component } from "@angular/core";
-import { BookingsRepository } from "../+state/bookings-repository.service";
-import { CustomersApi } from "@eternal/customers/api";
-import { combineLatest, filter, map, Observable } from "rxjs";
-import { ViewModel } from "../overview/overview.component";
+import { Component } from '@angular/core';
+import { MatTableModule } from '@angular/material/table';
+import { CommonModule } from '@angular/common';
+import { BookingsRepository } from '../+state/bookings-repository.service';
+import { CustomersApi } from '@eternal/customers/api';
+import { OverviewComponent, ViewModel } from '../overview/overview.component';
+import { combineLatest, filter, map, Observable } from 'rxjs';
 
 @Component({
-  selector: "eternal-overview-container",
+  selector: 'eternal-overview-container',
   template: `<eternal-overview
     *ngIf="viewModel$ | async as viewModel"
     [viewModel]="viewModel"
   ></eternal-overview>`,
+  standalone: true,
+  imports: [MatTableModule, CommonModule, OverviewComponent],
 })
 export class OverviewContainerComponent {
   // we have here two bugs which we'll eliminate later...
@@ -555,36 +550,6 @@ export class OverviewContainerComponent {
     private customersApi: CustomersApi
   ) {}
 }
-```
-
-_bookings.module.ts_
-
-```typescript
-import { CommonModule } from "@angular/common";
-import { NgModule } from "@angular/core";
-import { RouterModule } from "@angular/router";
-import { EffectsModule } from "@ngrx/effects";
-import { StoreModule } from "@ngrx/store";
-import { BookingsEffects } from "./+state/bookings-effects.service";
-import { bookingsFeature } from "./+state/bookings.reducer";
-import { OverviewContainerComponentModule } from "./overview-container/overview-container-component.module";
-import { OverviewContainerComponent } from "./overview-container/overview-container.component";
-
-@NgModule({
-  imports: [
-    CommonModule,
-    OverviewContainerComponentModule,
-    RouterModule.forChild([
-      {
-        path: "",
-        component: OverviewContainerComponent,
-      },
-    ]),
-    StoreModule.forFeature(bookingsFeature),
-    EffectsModule.forFeature([BookingsEffects]),
-  ],
-})
-export class BookingsModule {}
 ```
 
 </p>
