@@ -76,13 +76,13 @@ We don't have an `NgMdule` in this library, so create the lib folder manually.
 
 **2. Syncing `customers-data`**
 
-In `core-local-storage-state`, create a the file _local-storage-reducer.ts_ and add the following code:
+In `core-local-storage-state`, create a file _local-storage-reducer.ts_ and add the following code:
 
 ```typescript
-import { ActionReducer } from "@ngrx/store";
-import { localStorageSync } from "ngrx-store-localstorage";
+import { ActionReducer } from '@ngrx/store';
+import { localStorageSync } from 'ngrx-store-localstorage';
 
-const syncerFn = localStorageSync({ keys: ["customers"] });
+const syncerFn = localStorageSync({ keys: ['customers'] });
 
 export const localStorageReducer =
   <S>(reducer: ActionReducer<S>): ActionReducer<S> =>
@@ -92,18 +92,18 @@ export const localStorageReducer =
 
 Make sure that this is also export in the `index.ts` of the library.
 
-In _app.module.ts_, add this functions as metareducer:
+In _main.ts_, add this functions as metareducer:
 
 ```typescript
-@NgModule({
-  imports: [
-    // ...
-    StoreModule.forRoot({}, { metaReducers: [localStorageReducer] }),
-    // ...
+bootstrapApplication(AppComponent, {
+  providers: [
+    importProvidersFrom(
+      // ...
+      StoreModule.forRoot({}, { metaReducers: [localStorageReducer] }) // <-- replace existing StoreModule
+      // ...
+    ),
   ],
-  // ...
-})
-export class AppModule {}
+});
 ```
 
 Start the application and make sure that your `localStorage` has an entry for `customers`.
@@ -112,7 +112,7 @@ Start the application and make sure that your `localStorage` has an entry for `c
 
 **3. Factory function**
 
-We don't want that the features names are known to `core-local-storage-state`. It is acceptable, if the `AppModule` knows them. So let's change that.
+We don't want that the features names are known to `core-local-storage-state`. It is acceptable, if the `main.ts` knows them. So let's change that.
 
 _local-storage-reducer.ts_
 
@@ -126,46 +126,46 @@ export const localStorageReducer = (...featureStateNames: string[]) => {
 };
 ```
 
-_app.module.ts_
+_main.ts_
 
 ```typescript
-@NgModule({
-  imports: [
-    // ...
-    StoreModule.forRoot(
-      {},
-      { metaReducers: [localStorageReducer("customers")] }
+bootstrapApplication(AppComponent, {
+  providers: [
+    importProvidersFrom(
+      // ...
+      StoreModule.forRoot(
+        {},
+        { metaReducers: [localStorageReducer('customers')] }
+      )
+      // ...
     ),
-    // ...
   ],
-  // ...
-})
-export class AppModule {}
+});
 ```
 
 ## 2.2. Rehydration
 
 Let's add the states `holidays`, `security`, and `master` as well and enable rehydration.
 
-_app.module.ts_
+_main.ts_
 
 ```typescript
-@NgModule({
-  imports: [
-    // ...
-    StoreModule.forRoot(
-      {},
-      {
-        metaReducers: [
-          localStorageReducer("customers", "holidays", "security", "master"),
-        ],
-      }
+bootstrapApplication(AppComponent, {
+  providers: [
+    importProvidersFrom(
+      // ...
+      StoreModule.forRoot(
+        {},
+        {
+          metaReducers: [
+            localStorageReducer('customers', 'holidays', 'security', 'master'),
+          ],
+        }
+      )
+      // ...
     ),
-    // ...
   ],
-  // ...
-})
-export class AppModule {}
+});
 ```
 
 _local-storage-reducer.ts_
@@ -196,7 +196,7 @@ _sync-local-storage.ts_
 
 ```typescript
 export const syncLocalStorage = createAction(
-  "[Core] Sync Local Store",
+  '[Core] Sync Local Store',
   props<{ featureState: string }>()
 );
 ```
@@ -211,8 +211,8 @@ _local-storage-effects.ts_
 @Injectable()
 export class LocalStorageEffects {
   storageEvent = createEffect(() =>
-    fromEvent<StorageEvent>(window, "storage").pipe(
-      pluck("key"),
+    fromEvent<StorageEvent>(window, 'storage').pipe(
+      pluck('key'),
       filterDefined,
       map((featureState) => syncLocalStorage({ featureState }))
     )
@@ -220,20 +220,20 @@ export class LocalStorageEffects {
 }
 ```
 
-Expose `LocalStorageEffects` in the _index.ts_ and activate it in the `AppModule`.
+Expose `LocalStorageEffects` in the _index.ts_ and activate it in `main.ts`.
 
-_app.module_
+_main.ts_
 
 ```typescript
-@NgModule({
-  imports: [
-    // ...
-    EffectsModule.forRoot([LocalStorageEffects]),
-    // ...
+bootstrapApplication(AppComponent, {
+  providers: [
+    importProvidersFrom(
+      // ...
+      EffectsModule.forRoot([LocalStorageEffects])
+      // ...
+    ),
   ],
-  // ...
-})
-export class AppModule {}
+});
 ```
 
 ---
@@ -331,8 +331,14 @@ Add two new actions.
 _customers.actions.ts_
 
 ```typescript
-export const undo = createAction("[Customers] Undo");
-export const redo = createAction("[Customers] Redo");
+export const customersActions = createActionGroup({
+  source: 'Customers',
+  events: {
+    // ...
+    Undo: emptyProps(),
+    Redo: emptyProps(),
+  },
+});
 ```
 
 ---
@@ -370,7 +376,7 @@ export const customersFeature = createFeature({
   name: 'customers',
   reducer: createUndoRedoReducer<CustomersState>( // <- use the new reducer
     initialState,
-    immerOn(init, (state) => {
+    immerOn(customersActions.init, (state) => {
       if (state.hasError) {
         safeAssign(state, initialState);
       }
@@ -405,7 +411,7 @@ export const fromCustomers = {
 _customers.repository.ts_
 
 ```typescript
-@Injectable({ providedIn: "root" })
+@Injectable({ providedIn: 'root' })
 export class CustomersRepository {
   // ...
 
@@ -436,14 +442,16 @@ Just copy the contents shown below into the quoted files.
 _customers-root.component.ts_
 
 ```typescript
-import { Component } from "@angular/core";
-import { Router } from "@angular/router";
-import { CustomersRepository } from "@eternal/customers/data";
-import { MessageService } from "@eternal/shared/ui-messaging";
-import { first } from "rxjs";
+import { Component } from '@angular/core';
+import { Router } from '@angular/router';
+import { CustomersRepository } from '@eternal/customers/data';
+import { MessageService } from '@eternal/shared/ui-messaging';
+import { first } from 'rxjs';
 
 @Component({
-  templateUrl: "./customers-root.component.html",
+  templateUrl: './customers-root.component.html',
+  standalone: true,
+  imports: [RouterModule, LetModule, MatButtonModule, MatIconModule],
 })
 export class CustomersRootComponent {
   constructor(
@@ -452,9 +460,9 @@ export class CustomersRootComponent {
     messageService: MessageService
   ) {
     customersRepository.hasError$.pipe(first(Boolean)).subscribe(() => {
-      router.navigateByUrl("/");
+      router.navigateByUrl('/');
       messageService.confirm(
-        "Sorry, but Customers are not available at the moment.<br>Please try again later."
+        'Sorry, but Customers are not available at the moment.<br>Please try again later.'
       );
     });
   }
@@ -494,29 +502,6 @@ _customers-root.component.html_
 <router-outlet></router-outlet>
 ```
 
-_customers-root.component.ts_
-
-```typescript
-import { NgModule } from "@angular/core";
-import { RouterModule } from "@angular/router";
-import { ReactiveComponentModule } from "@ngrx/component";
-import { CustomersRootComponent } from "./customers-root.component";
-import { MatIconModule } from "@angular/material/icon";
-import { MatButtonModule } from "@angular/material/button";
-
-@NgModule({
-  declarations: [CustomersRootComponent],
-  exports: [CustomersRootComponent],
-  imports: [
-    RouterModule,
-    ReactiveComponentModule,
-    MatIconModule,
-    MatButtonModule,
-  ],
-})
-export class CustomersRootComponentModule {}
-```
-
 Try it out by switching between the pages and selecting multipe customers.
 
 ## 3.3. Limit to customers selection
@@ -544,15 +529,17 @@ Add two new actions, we'll use to undo:
 _holidays.actions.ts_
 
 ```typescript
-export const addFavouriteUndo = createAction(
-  "[Holidays] Add Favourite Undo",
-  props<{ id: number }>()
-);
+import { Holiday } from '@eternal/holidays/model';
+import { createActionGroup, emptyProps, props } from '@ngrx/store';
 
-export const removeFavouriteUndo = createAction(
-  "[Holidays] Remove Favourite Undo",
-  props<{ id: number }>()
-);
+export const holidaysActions = createActionGroup({
+  source: 'Holidays',
+  events: {
+    // ....
+    'Add Favourite Undo': props<{ id: number }>(),
+    'Remove Favourite Undo': props<{ id: number }>(),
+  },
+});
 ```
 
 ---
@@ -565,19 +552,27 @@ _holidays.reducer.ts_
 
 ```typescript
 // replace with favouriteAdded
-immerOn(addFavourite, removeFavouriteUndo, (state, { id }) => {
-  if (state.favouriteIds.includes(id) === false) {
-    state.favouriteIds.push(id);
+immerOn(
+  holidaysActions.addFavourite,
+  holidaysActions.removeFavouriteUndo,
+  (state, { id }) => {
+    if (state.favouriteIds.includes(id) === false) {
+      state.favouriteIds.push(id);
+    }
   }
-});
+);
 
 // replace with favouriteRemoved
-immerOn(removeFavourite, addFavouriteUndo, (state, { id }) => {
-  const ix = state.favouriteIds.indexOf(id);
-  if (ix > -1) {
-    state.favouriteIds.splice(ix, 1);
+immerOn(
+  holidaysActions.removeFavourite,
+  holidaysActions.addFavouriteUndo,
+  (state, { id }) => {
+    const ix = state.favouriteIds.indexOf(id);
+    if (ix > -1) {
+      state.favouriteIds.splice(ix, 1);
+    }
   }
-});
+);
 ```
 
 ---
@@ -586,34 +581,34 @@ immerOn(removeFavourite, addFavouriteUndo, (state, { id }) => {
 
 The last step is to apply `optimisticUpdate`, where we pass the http request and also define the fallback action if something goes wrong.
 
-_customers.effects.ts_
+_holidays.effects.ts_
 
 ```typescript
-addFavourite$ = createEffect(() =>
-  this.actions$.pipe(
-    ofType(actions.addFavourite),
+addFavourite$ = createEffect(() => {
+  return this.actions$.pipe(
+    ofType(holidaysActions.addFavourite),
     optimisticUpdate({
       run: ({ id }) =>
         this.httpClient
           .post<void>(`${this.#baseUrl}/favourite/${id}`, {})
-          .pipe(map(() => actions.favouriteAdded({ id }))),
-      undoAction: ({ id }) => actions.addFavouriteUndo({ id }),
+          .pipe(map(() => holidaysActions.favouriteAdded({ id }))),
+      undoAction: ({ id }) => holidaysActions.addFavouriteUndo({ id }),
     })
-  )
-);
+  );
+});
 
-removeFavourite$ = createEffect(() =>
-  this.actions$.pipe(
-    ofType(actions.removeFavourite),
+removeFavourite$ = createEffect(() => {
+  return this.actions$.pipe(
+    ofType(holidaysActions.removeFavourite),
     optimisticUpdate({
       run: ({ id }) =>
         this.httpClient
           .delete<void>(`${this.#baseUrl}/favourite/${id}`, {})
-          .pipe(map(() => actions.favouriteRemoved({ id }))),
-      undoAction: ({ id }) => actions.removeFavouriteUndo({ id }),
+          .pipe(map(() => holidaysActions.favouriteRemoved({ id }))),
+      undoAction: ({ id }) => holidaysActions.removeFavouriteUndo({ id }),
     })
-  )
-);
+  );
+});
 ```
 
 ---
