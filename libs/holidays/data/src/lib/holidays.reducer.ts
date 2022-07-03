@@ -1,11 +1,12 @@
 import { Holiday } from '@eternal/holidays/model';
-import { createFeature, createReducer } from '@ngrx/store';
+import { createFeature } from '@ngrx/store';
 import { holidaysActions } from './holidays.actions';
 import { LoadStatus } from '@eternal/shared/ngrx-utils';
 import { immerOn } from 'ngrx-immer/store';
 import { safeAssign } from '@eternal/shared/util';
+import { initialUndoRedoState, undoRedo, UndoRedoState } from 'ngrx-wieder';
 
-export interface HolidaysState {
+export interface HolidaysState extends UndoRedoState {
   holidays: Holiday[];
   favouriteIds: number[];
   loadStatus: LoadStatus;
@@ -15,11 +16,17 @@ const initialState: HolidaysState = {
   holidays: [],
   favouriteIds: [],
   loadStatus: 'not loaded',
+  ...initialUndoRedoState,
 };
+
+const { createUndoRedoReducer } = undoRedo({
+  undoActionType: holidaysActions.undo.type,
+  redoActionType: holidaysActions.redo.type,
+});
 
 export const holidaysFeature = createFeature({
   name: 'holidays',
-  reducer: createReducer<HolidaysState>(
+  reducer: createUndoRedoReducer<HolidaysState>(
     initialState,
     immerOn(holidaysActions.load, (state) => {
       state.loadStatus = 'loading';

@@ -46,9 +46,7 @@ bootstrapApplication(AppComponent, {
       StoreModule.forRoot(
         {},
         {
-          metaReducers: [
-            localStorageReducer('customers', 'holidays', 'security', 'master'),
-          ],
+          metaReducers: [localStorageReducer()],
         }
       ),
       EffectsModule.forRoot([LocalStorageEffects]),

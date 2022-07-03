@@ -11,5 +11,7 @@ export const holidaysActions = createActionGroup({
     'Favourite Added': props<{ id: number }>(),
     'Remove Favourite': props<{ id: number }>(),
     'Favourite Removed': props<{ id: number }>(),
+    Undo: emptyProps(),
+    Redo: emptyProps(),
   },
 });
