@@ -5,6 +5,7 @@ import { Customer } from '@eternal/customers/model';
 import { Observable } from 'rxjs';
 import { fromCustomers } from './customers.selectors';
 import { deepClone, filterDefined } from '@eternal/shared/ngrx-utils';
+import { customersFeature } from './customers.reducer';
 
 @Injectable({ providedIn: 'root' })
 export class CustomersRepository {
@@ -21,6 +22,10 @@ export class CustomersRepository {
   readonly selectedCustomer$: Observable<Customer> = this.store
     .select(fromCustomers.selectSelectedCustomer)
     .pipe(filterDefined, deepClone);
+
+  readonly hasError$: Observable<boolean> = this.store.select(
+    customersFeature.selectHasError
+  );
 
   findById(id: number): Observable<Customer> {
     return this.store

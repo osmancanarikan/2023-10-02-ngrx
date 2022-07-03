@@ -8,6 +8,7 @@ export interface CustomersState {
   total: number;
   selectedId: number | undefined;
   isLoaded: boolean;
+  hasError: boolean;
 }
 
 export const initialState: CustomersState = {
@@ -16,12 +17,19 @@ export const initialState: CustomersState = {
   total: 0,
   selectedId: undefined,
   isLoaded: false,
+  hasError: false,
 };
 
 export const customersFeature = createFeature({
   name: 'customers',
   reducer: createReducer<CustomersState>(
     initialState,
+    on(customersActions.init, (state): CustomersState => {
+      if (state.hasError) {
+        return initialState;
+      }
+      return state;
+    }),
     on(
       customersActions.load,
       (state, { page }): CustomersState => ({
@@ -30,7 +38,7 @@ export const customersFeature = createFeature({
       })
     ),
     on(
-      customersActions.loaded,
+      customersActions.loadSuccess,
       (state, { customers, total }): CustomersState => ({
         ...state,
         customers,
@@ -38,6 +46,10 @@ export const customersFeature = createFeature({
         isLoaded: true,
       })
     ),
+    on(customersActions.loadFailure, (state) => ({
+      ...state,
+      hasError: true,
+    })),
     on(
       customersActions.select,
       (state, { id }): CustomersState => ({
