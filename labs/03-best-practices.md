@@ -40,7 +40,7 @@ export interface HolidaysState {
   loadStatus: LoadStatus;
 }
 
-const initialState: HolidaysState = { holidays: [], loadStatus: "not loaded" };
+const initialState: HolidaysState = { holidays: [], loadStatus: 'not loaded' };
 
 // ...
 ```
@@ -66,8 +66,14 @@ If you have merged before from a solution branch, you also have the `holidays-da
 _holidays.actions.ts_
 
 ```typescript
-export const get = createAction("[Holidays] Get"):
-// ...other actions
+export const holidaysActions = createActionGroup({
+  source: 'Holidays',
+  events: {
+    Get: emptyProps(), // <--- add this
+    Load: emptyProps(),
+    // ...
+  }
+}
 ```
 
 _holidays.effects.ts_
@@ -75,16 +81,16 @@ _holidays.effects.ts_
 ```typescript
 @Injectable()
 export class HolidaysEffects {
-  get$ = createEffect(() =>
-    this.actions$.pipe(
-      ofType(actions.get),
+  get$ = createEffect(() => {
+    return this.actions$.pipe(
+      ofType(holidaysActions.get),
       concatLatestFrom(() =>
         this.store.select(holidaysFeature.selectLoadStatus)
       ),
-      filter(([, loadStatus]) => loadStatus === "not loaded"),
-      map(() => load())
-    )
-  );
+      filter(([, loadStatus]) => loadStatus === 'not loaded'),
+      map(() => holidaysActions.load())
+    );
+  });
 
   // ...
 }
@@ -95,7 +101,37 @@ export class HolidaysEffects {
 
 ---
 
-**3. Modifying `loadStatus`**
+**3. Adding a selector**
+
+Add a new selector called `selectLoadStatus`:
+
+<details>
+<summary>Show Solution</summary>
+<p>
+
+_holidays.selectors.ts_
+
+```typescript
+//...
+
+const selectIsLoaded = createSelector(
+  holidaysFeature.selectLoadStatus,
+  (loadStatus) => loadStatus === 'loaded'
+);
+
+export const fromHolidays = {
+  get: holidaysFeature.selectHolidays,
+  selectIsLoaded,
+  selectHolidaysWithFavourite,
+};
+```
+
+</p>
+</details>
+
+---
+
+**4. Modifying `loadStatus`**
 
 The reducer should update the `loadStatus` when the actions `load` and `loaded` are dispatched.
 
@@ -107,18 +143,25 @@ _holidays.reducer.ts_
 
 ```typescript
 export const holidaysFeature = createFeature({
-  name: "holiday",
-  reducer: createReducer(
+  name: 'holidays',
+  reducer: createReducer<HolidaysState>(
     initialState,
-    on(load, (state) => ({
-      ...state,
-      loadStatus: "loading",
-    })),
-    on(loaded, (state, { holidays }) => ({
-      ...state,
-      loadStatus: "loaded",
-      holidays,
-    }))
+    on(
+      holidaysActions.load,
+      (state): HolidaysState => ({
+        ...state,
+        loadStatus: 'loading',
+      })
+    ),
+    on(
+      holidaysActions.loaded,
+      (state, { holidays }): HolidaysState => ({
+        ...state,
+        loadStatus: 'loaded',
+        holidays,
+      })
+    )
+    // other reducers
   ),
 });
 ```
@@ -128,7 +171,7 @@ export const holidaysFeature = createFeature({
 
 ---
 
-**4. Pre-fetching with `HolidayDataGuard`**
+**5. Pre-fetching with `HolidayDataGuard`**
 
 In `holidays-feature`, create a `HolidayDataGuard`, add it to the holiday's root route (you have to change the router config a little bit). The guard should dispatch the `get` action and should return an `Observable` which emits `true` if the `loadStatus` is set to `loaded`.
 
@@ -139,53 +182,51 @@ In `holidays-feature`, create a `HolidayDataGuard`, add it to the holiday's root
 _holidays-data.guard.ts_
 
 ```typescript
-import { CanActivate, UrlTree } from "@angular/router";
-import { Injectable } from "@angular/core";
-import { fromHolidays, holidaysActions } from "@eternal/holidays/data";
-import { Store } from "@ngrx/store";
-import { filter, map } from "rxjs/operators";
-import { Observable } from "rxjs";
+import { CanActivate, UrlTree } from '@angular/router';
+import { Injectable } from '@angular/core';
+import { fromHolidays, holidaysActions } from '@eternal/holidays/data';
+import { Store } from '@ngrx/store';
+import { filter } from 'rxjs/operators';
+import { Observable } from 'rxjs';
 
 @Injectable({
-  providedIn: "root",
+  providedIn: 'root',
 })
 export class HolidaysDataGuard implements CanActivate {
   constructor(private store: Store) {}
   canActivate(): Observable<boolean | UrlTree> {
     this.store.dispatch(holidaysActions.get());
-    return this.store.select(fromHolidays.selectLoadStatus).pipe(
-      filter((loadStatus) => loadStatus === "loaded"),
-      map(() => true)
-    );
+    return this.store.select(fromHolidays.selectIsLoaded).pipe(filter(Boolean));
   }
 }
 ```
 
-_holidays-feature.module.ts_
+_holidays-routes.ts_
 
 ```typescript
-@NgModule({
-  imports: [
-    RouterModule.forChild([
+import { Routes } from '@angular/router';
+import { HolidaysComponent } from './holidays/holidays.component';
+import { RequestInfoComponent } from './request-info/request-info.component';
+import { holidaysDataProvider } from '@eternal/holidays/data';
+import { HolidaysDataGuard } from './holidays-data-.guard';
+
+export const holidaysRoutes: Routes = [
+  {
+    path: '',
+    canActivate: [HolidaysDataGuard],
+    providers: [holidaysDataProvider],
+    children: [
       {
-        path: "",
-        canActivate: [HolidaysDataGuard],
-        children: [
-          {
-            path: "",
-            component: HolidaysComponent,
-          },
-          {
-            path: "request-info/:holidayId",
-            component: RequestInfoComponent,
-          },
-        ],
+        path: '',
+        component: HolidaysComponent,
       },
-    ]),
-    // ... other imports
-  ],
-})
-export class HolidaysFeatureModule {}
+      {
+        path: 'request-info/:holidayId',
+        component: RequestInfoComponent,
+      },
+    ],
+  },
+];
 ```
 
 </p>
@@ -193,7 +234,7 @@ export class HolidaysFeatureModule {}
 
 ---
 
-**5. Simplify `HolidaysComponent`**
+**6. Simplify `HolidaysComponent`**
 
 `HolidaysComponent` shouldn't dispatch `load` anymore in `ngOnInit`.
 
@@ -205,9 +246,9 @@ _holidays.component.ts_
 
 ```typescript
 @Component({
-  selector: "eternal-holidays",
-  templateUrl: "./holidays.component.html",
-  styleUrls: ["./holidays.component.scss"],
+  selector: 'eternal-holidays',
+  templateUrl: './holidays.component.html',
+  styleUrls: ['./holidays.component.scss'],
 })
 export class HolidaysComponent {
   holidays$ = this.store.select(fromHolidays.selectHolidaysWithFavourite);
@@ -225,7 +266,7 @@ export class HolidaysComponent {
 
 Implement partial cache in customers and use the `page` property in `CustomerState` for the invalidation.
 
-In order to activate pagination, the `CustomersContainerComponent` needs to handle the `switchPage` event of the `CustomersComponent`. Please note, that `CustomerComponent` is zero-based whereas in the state it is not zero-based.
+In order to activate pagination, the `CustomersContainerComponent` needs to handle the `switchPage` event of the `CustomersComponent`. Please note, that `CustomersComponent` works with zero-based index, whereas in the state it is not zero-based.
 
 **1. Actions `init` and `get`**
 
@@ -235,13 +276,21 @@ With `init` the `DataGuard` will send a request to initialize (if not already lo
 <summary>Show Solution</summary>
 <p>
 
-_customerss.actions.ts_
+_customers.actions.ts_
 
 ```typescript
-export const init = createAction("[Customers] Init");
-export const get = createAction("[Customers] Get", props<{ page: number }>());
+import { Customer } from '@eternal/customers/model';
+import { createActionGroup, emptyProps, props } from '@ngrx/store';
 
-// ...
+export const customersActions = createActionGroup({
+  source: 'Customers',
+  events: {
+    Init: emptyProps(),
+    Get: props<{ page: number }>(),
+    Load: props<{ page: number }>(),
+    // ... further actions
+  },
+});
 ```
 
 </p>
@@ -251,9 +300,9 @@ export const get = createAction("[Customers] Get", props<{ page: number }>());
 
 **2. Adapt reducer and state**
 
-The `CustomerState` gets a new property `isLoaded` which is set to `false` in the `initialState`. `isLoaded` is set to true when the action `loaded` is dispatched.
+The `CustomerState` gets a new property `isLoaded` which is set to `false` in the `initialState`. `isLoaded` is set to `true` when the action `loaded` is dispatched.
 
-We don't need `LoadStatus`, because the content (`page` property) is set in `load`.
+We don't need `LoadStatus`, because the context (`page` property) is used instead of the `LoadStatus::load` property.
 
 <details>
 <summary>Show Solution</summary>
@@ -273,19 +322,25 @@ export const initialState: CustomersState = {
 };
 
 export const customersFeature = createFeature({
-  name: "customers",
+  name: 'customers',
   reducer: createReducer<CustomersState>(
     // ...
-    on(load, (state, { page }) => ({
-      ...state,
-      page,
-    })),
-    on(loaded, (state, { customers, total }) => ({
-      ...state,
-      customers,
-      total,
-      isLoaded: true,
-    }))
+    on(
+      customersActions.load,
+      (state, { page }): CustomersState => ({
+        ...state,
+        page,
+      })
+    ),
+    on(
+      customersActions.loaded,
+      (state, { customers, total }): CustomersState => ({
+        ...state,
+        customers,
+        total,
+        isLoaded: true,
+      })
+    )
     // ...
   ),
 });
@@ -309,27 +364,27 @@ _customers.effects.ts_
 ```typescript
 @Injectable()
 export class CustomersEffects {
-  #baseUrl = "/customers";
+  #baseUrl = '/customers';
 
-  init$ = createEffect(() =>
-    this.actions$.pipe(
-      ofType(init),
+  init$ = createEffect(() => {
+    return this.actions$.pipe(
+      ofType(customersActions.init),
       concatLatestFrom(() =>
         this.store.select(customersFeature.selectIsLoaded)
       ),
       filter(([, isLoaded]) => isLoaded === false),
-      map(() => get({ page: 1 }))
-    )
-  );
+      map(() => customersActions.get({ page: 1 }))
+    );
+  });
 
-  get$ = createEffect(() =>
-    this.actions$.pipe(
-      ofType(get),
+  get$ = createEffect(() => {
+    return this.actions$.pipe(
+      ofType(customersActions.get),
       concatLatestFrom(() => this.store.select(customersFeature.selectPage)),
       filter(([action, page]) => action.page !== page),
-      map(([{ page }]) => load({ page }))
-    )
-  );
+      map(([{ page }]) => customersActions.load({ page }))
+    );
+  });
 
   //...
 }
@@ -342,9 +397,9 @@ export class CustomersEffects {
 
 **4. Adapt Repository**
 
-And for everybody outside of NgRx, we have to expose the new changes as well.
+And for everyone outside of NgRx, we have to expose the new changes as well.
 
-The `CustomersRepository` could optionally rename `load` to `get` (not really required). Either way, inside `get/load` it needs to dispatch the `get` action and it also offers a new method `init`.
+The `CustomersRepository` could optionally rename `load` to `get` (not really required). Either way, inside `get/load` it needs to dispatch the `get` action, and it also offers a new method `init`.
 
 <details>
 <summary>Show Solution</summary>
@@ -353,7 +408,7 @@ The `CustomersRepository` could optionally rename `load` to `get` (not really re
 _customers-repository.service.ts_
 
 ```typescript
-@Injectable({ providedIn: "root" })
+@Injectable({ providedIn: 'root' })
 export class CustomersRepository {
   // ...
 
@@ -429,7 +484,7 @@ load$ = createEffect(() =>
     switchMap(({ page }) =>
       this.http
         .get<{ content: Customer[]; total: number }>(this.#baseUrl, {
-          params: new HttpParams().set("page", page),
+          params: new HttpParams().set('page', page),
         })
         .pipe(
           map(({ content, total }) =>
@@ -459,14 +514,14 @@ Apply it to `CustomerEffects::load$`.
 `shared-ngrx-utils`: _safe-switch-map.ts_
 
 ```typescript
-import { TypedAction } from "@ngrx/store/src/models";
-import { catchError, Observable, of, OperatorFunction, switchMap } from "rxjs";
-import { noopAction } from "./noop.action";
+import { TypedAction } from '@ngrx/store/src/models';
+import { catchError, Observable, of, OperatorFunction, switchMap } from 'rxjs';
+import { noopAction } from './noop.action';
 
 export function safeSwitchMap<S, T extends string>(
   project: (value: S) => Observable<TypedAction<T>>
-): OperatorFunction<S, TypedAction<T | "NOOP">> {
-  return (source$: Observable<S>): Observable<TypedAction<T | "NOOP">> =>
+): OperatorFunction<S, TypedAction<T | '[Util] NOOP'>> {
+  return (source$: Observable<S>): Observable<TypedAction<T | '[Util] NOOP'>> =>
     source$.pipe(
       switchMap((value) =>
         project(value).pipe(catchError(() => of(noopAction())))
@@ -482,11 +537,11 @@ _customers.effect.ts_
 ```typescript
 load$ = createEffect(() =>
   this.actions$.pipe(
-    ofType(load),
+    ofType(customersActions.load),
     safeSwitchMap(({ page }) =>
       this.http
         .get<{ content: Customer[]; total: number }>(this.#baseUrl, {
-          params: new HttpParams().set("page", page),
+          params: new HttpParams().set('page', page),
         })
         .pipe(
           map(({ content, total }) =>
@@ -520,13 +575,20 @@ Create a new action `loadFailure` and optionally rename `loaded` to `loadSuccess
 _customers.actions.ts_
 
 ```typescript
-export const loadSuccess = createAction(
-  // <- rename from loaded
-  "[Customers] Load Success",
-  props<{ customers: Customer[]; total: number; page: number }>()
-);
-
-export const loadFailure = createAction("[Customers] Load Failure");
+export const customersActions = createActionGroup({
+  source: 'Customers',
+  events: {
+    // ...
+    Load: props<{ page: number }>(),
+    'Load Failure': emptyProps(),
+    'Load Success': props<{
+      customers: Customer[];
+      total: number;
+      page: number;
+    }>(),
+    // ...
+  },
+});
 ```
 
 </p>
@@ -540,8 +602,10 @@ Our `safeSwitchMap` should allow a fallback function:
 export function safeSwitchMap<S, T extends string, U extends string>(
   project: (value: S) => Observable<TypedAction<T>>,
   errorAction?: (err: Error) => TypedAction<U>
-): OperatorFunction<S, TypedAction<T | U | "NOOP">> {
-  return (source$: Observable<S>): Observable<TypedAction<T | U | "NOOP">> =>
+): OperatorFunction<S, TypedAction<T | U | '[Util] NOOP'>> {
+  return (
+    source$: Observable<S>
+  ): Observable<TypedAction<T | U | '[Util] NOOP'>> =>
     source$.pipe(
       switchMap((value) =>
         project(value).pipe(
@@ -567,19 +631,19 @@ export class CustomersEffects {
 
   load$ = createEffect(() =>
     this.actions$.pipe(
-      ofType(load),
+      ofType(customersActions.load),
       safeSwitchMap(
         ({ page }) =>
           this.http
             .get<{ content: Customer[]; total: number }>(this.#baseUrl, {
-              params: new HttpParams().set("page", page),
+              params: new HttpParams().set('page', page),
             })
             .pipe(
               map(({ content, total }) =>
                 loadSuccess({ customers: content, total, page })
               )
             ),
-        () => loadFailure() // <- this is new
+        () => customersActions.loadFailure() // <- this is new
       )
     )
   );
@@ -611,16 +675,16 @@ export const initialState: CustomersState = {
 };
 
 export const customersFeature = createFeature({
-  name: "customers",
+  name: 'customers',
   reducer: createReducer<CustomersState>(
     initialState,
-    on(init, (state) => {
+    on(customersActions.init, (state) => {
       if (state.hasError) {
         return initialState;
       }
       return state;
     }),
-    on(loadFailure, (state) => ({
+    on(customersActions.loadFailure, (state) => ({
       ...state,
       hasError: true,
     }))
@@ -669,7 +733,7 @@ _customer-root.component.ts_
 
 ```typescript
 @Component({
-  templateUrl: "./customers-root.component.html",
+  templateUrl: './customers-root.component.html',
 })
 export class CustomersRootComponent {
   constructor(
@@ -678,9 +742,9 @@ export class CustomersRootComponent {
     messageService: MessageService
   ) {
     customersRepository.hasError$.pipe(first(Boolean)).subscribe(() => {
-      router.navigateByUrl("/");
+      router.navigateByUrl('/');
       messageService.confirm(
-        "Sorry, but Customers are not available at the moment.<br>Please try again later."
+        'Sorry, but Customers are not available at the moment.<br>Please try again later.'
       );
     });
   }
@@ -706,33 +770,37 @@ Upgrade the `update` action in `customers-data` so that it has parameters for th
 _customers.actions.ts_
 
 ```typescript
-export const update = createAction(
-  "[Customers] Update",
-  props<{ customer: Customer; forward: string; message: string }>()
-);
+export const customersActions = createActionGroup({
+  source: 'Customers',
+  events: {
+    // ...
+    Update: props<{ customer: Customer; forward: string; message: string }>(),
+    // ...
+  },
+});
 ```
 
 **2. Modify the `update$` property in the effects**
 
 ```typescript
-update$ = createEffect(() =>
-  this.actions$.pipe(
-    ofType(update),
+update$ = createEffect(() => {
+  return this.actions$.pipe(
+    ofType(customersActions.update),
     concatMap(({ customer, forward, message }) =>
       this.http.put<Customer[]>(this.#baseUrl, customer).pipe(
         tap(() => this.uiMessage.info(message)),
         tap(() => this.router.navigateByUrl(forward))
       )
     ),
-    map(() => load({ page: 1 }))
-  )
-);
+    map(() => customersActions.load({ page: 1 }))
+  );
+});
 ```
 
 **3. Update the `CustomersRepository`**
 
 ```typescript
-@Injectable({ providedIn: "root" })
+@Injectable({ providedIn: 'root' })
 export class CustomersRepository {
   // ...
 
@@ -762,6 +830,9 @@ export class EditCustomerComponent {
       'Customer has been updated'
     );
   }
+
+  // ...
+}
 ```
 
 </p>
@@ -783,7 +854,7 @@ _customers.actions.ts_
 
 ```typescript
 export const update = createAction(
-  "[Customers] Update",
+  '[Customers] Update',
   props<{
     customer: Customer;
     forward: string;
@@ -796,9 +867,9 @@ export const update = createAction(
 _customers.effects.ts_
 
 ```typescript
-update$ = createEffect(() =>
-  this.actions$.pipe(
-    ofType(update),
+update$ = createEffect(() => {
+  return this.actions$.pipe(
+    ofType(customersActions.update),
     concatMap(({ customer, forward, message, callback }) =>
       this.http.put<Customer[]>(this.#baseUrl, customer).pipe(
         tap(() => {
@@ -810,15 +881,15 @@ update$ = createEffect(() =>
         tap(() => this.router.navigateByUrl(forward))
       )
     ),
-    map(() => load({ page: 1 }))
-  )
-);
+    map(() => customersActions.load({ page: 1 }))
+  );
+});
 ```
 
 _customers-repository.service.ts_
 
 ```typescript
-@Injectable({ providedIn: "root" })
+@Injectable({ providedIn: 'root' })
 export class CustomersRepository {
   // ...
   update(
@@ -840,7 +911,7 @@ _edit-customer.component.ts_
 
 ```typescript
 @Component({
-  selector: "eternal-edit-customer",
+  selector: 'eternal-edit-customer',
   template: ` <eternal-customer
     *ngIf="data$ | async as data"
     [customer]="data.customer"
@@ -849,6 +920,8 @@ _edit-customer.component.ts_
     (save)="this.submit($event)"
     (remove)="this.remove($event)"
   ></eternal-customer>`,
+  standalone: true,
+  imports: [CommonModule, CustomerComponent],
 })
 export class EditCustomerComponent {
   data$: Observable<{ customer: Customer; countries: Options }>;
@@ -858,14 +931,14 @@ export class EditCustomerComponent {
   // ...
 
   submit(customer: Customer) {
-    const urlTree = this.router.createUrlTree([".."], {
+    const urlTree = this.router.createUrlTree(['..'], {
       relativeTo: this.route,
     });
     this.disableSubmitButton = true;
     this.customersRepository.update(
       { ...customer, id: this.customerId },
       urlTree.toString(),
-      "Customer has been updated",
+      'Customer has been updated',
       () => (this.disableSubmitButton = false) // <- this is the callback
     );
   }
@@ -881,9 +954,9 @@ You also need to add the property `disableSubmitButton` to `CustomerComponent` a
 
 ## 4.1 Active Dependency in `bookings`
 
-We have a bug in booking. When the selected customers changes, the selector updates the name in the `OverviewComponent` but that doesn't apply to the bookings.
+We have a bug in booking. When the selected customer changes, the selector updates the name in the `OverviewComponent` but that doesn't apply to the bookings.
 
-This is a bug due an active depdency. Selctors cannot help you with that.
+This is a bug due an active dependency. Selectors cannot help you with that.
 
 Fix it in `BookingsEffects`.
 
@@ -898,19 +971,21 @@ _bookings-effects.services.ts_
 export class BookingsEffects {
   constructor(private customersApi: CustomersApi) {}
 
-  selectedCustomer$ = createEffect(() =>
-    this.customersApi.selectedCustomer$.pipe(
-      pluck("id"),
-      map((id) => loaded({ bookings: bookings.get(id) || [] }))
-    )
-  );
+  selectedCustomer$ = createEffect(() => {
+    return this.customersApi.selectedCustomer$.pipe(
+      pluck('id'),
+      map((id) => bookingsActions.loaded({ bookings: bookings.get(id) || [] }))
+    );
+  });
 }
 ```
+
+You can also remove the logic in the `OverviewContainerComponent` that dispatches the `load` action. It is also not required anymore.
 
 </p>
 </details>
 
-## 4.2 Optional: `bookings` as sub-module of `customers`
+## 4.2 Optional: `bookings` as a sub-module of `customers`
 
 This is how it should really be done. `Bookings` fully depends on customers and should therefore be a submodule and a sub-root.
 
