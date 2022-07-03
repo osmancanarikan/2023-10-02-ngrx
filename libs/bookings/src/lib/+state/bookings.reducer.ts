@@ -30,10 +30,12 @@ export const bookingsFeature = createFeature({
   name: 'bookings',
   reducer: createReducer(
     initialState,
-    on(bookingsActions.loaded, (state, action) => ({
-      ...state,
-      bookings: action.bookings,
-      loaded: true,
-    }))
+    on(bookingsActions.loaded, (state, action): BookingsState => {
+      return {
+        ...state,
+        bookings: action.bookings,
+        loaded: true,
+      };
+    })
   ),
 });
