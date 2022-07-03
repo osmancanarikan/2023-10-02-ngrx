@@ -1,6 +1,8 @@
 import { Customer } from '@eternal/customers/model';
-import { createFeature, createReducer, on } from '@ngrx/store';
+import { createFeature, createReducer } from '@ngrx/store';
 import { customersActions } from './customers.actions';
+import { immerOn } from 'ngrx-immer/store';
+import { safeAssign } from '@eternal/shared/util';
 
 export interface CustomersState {
   customers: Customer[];
@@ -24,45 +26,31 @@ export const customersFeature = createFeature({
   name: 'customers',
   reducer: createReducer<CustomersState>(
     initialState,
-    on(customersActions.init, (state): CustomersState => {
+    immerOn(customersActions.init, (state) => {
       if (state.hasError) {
-        return initialState;
+        // This will not work: state = initialState;
+        safeAssign(state, initialState);
       }
-      return state;
     }),
-    on(
-      customersActions.load,
-      (state, { page }): CustomersState => ({
-        ...state,
-        page,
-      })
-    ),
-    on(
-      customersActions.loadSuccess,
-      (state, { customers, total }): CustomersState => ({
-        ...state,
+    immerOn(customersActions.load, (state, { page }) => {
+      state.page = page;
+    }),
+    immerOn(customersActions.loadSuccess, (state, { customers, total }) => {
+      safeAssign(state, {
         customers,
         total,
         isLoaded: true,
-      })
-    ),
-    on(customersActions.loadFailure, (state) => ({
-      ...state,
-      hasError: true,
-    })),
-    on(
-      customersActions.select,
-      (state, { id }): CustomersState => ({
-        ...state,
-        selectedId: id,
-      })
-    ),
-    on(
-      customersActions.unselect,
-      (state): CustomersState => ({
-        ...state,
-        selectedId: undefined,
-      })
-    )
+        hasError: false,
+      });
+    }),
+    immerOn(customersActions.loadFailure, (state) => {
+      state.hasError = true;
+    }),
+    immerOn(customersActions.select, (state, { id }) => {
+      state.selectedId = id;
+    }),
+    immerOn(customersActions.unselect, (state) => {
+      state.selectedId = undefined;
+    })
   ),
 });
