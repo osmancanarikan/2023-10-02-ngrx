@@ -26,5 +26,7 @@ export const customersActions = createActionGroup({
     Removed: props<{ customers: Customer[] }>(),
     Select: props<{ id: number }>(),
     Unselect: emptyProps(),
+    Undo: emptyProps(),
+    Redo: emptyProps(),
   },
 });

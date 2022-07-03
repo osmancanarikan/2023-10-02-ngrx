@@ -1,10 +1,11 @@
 import { Customer } from '@eternal/customers/model';
-import { createFeature, createReducer } from '@ngrx/store';
+import { createFeature } from '@ngrx/store';
 import { customersActions } from './customers.actions';
 import { immerOn } from 'ngrx-immer/store';
 import { safeAssign } from '@eternal/shared/util';
+import { initialUndoRedoState, undoRedo, UndoRedoState } from 'ngrx-wieder';
 
-export interface CustomersState {
+export interface CustomersState extends UndoRedoState {
   customers: Customer[];
   page: number;
   total: number;
@@ -20,11 +21,17 @@ export const initialState: CustomersState = {
   selectedId: undefined,
   isLoaded: false,
   hasError: false,
+  ...initialUndoRedoState,
 };
+
+const { createUndoRedoReducer } = undoRedo({
+  undoActionType: customersActions.undo.type,
+  redoActionType: customersActions.redo.type,
+});
 
 export const customersFeature = createFeature({
   name: 'customers',
-  reducer: createReducer<CustomersState>(
+  reducer: createUndoRedoReducer<CustomersState>(
     initialState,
     immerOn(customersActions.init, (state) => {
       if (state.hasError) {
