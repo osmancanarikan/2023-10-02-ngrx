@@ -46,10 +46,13 @@ export const customersFeature = createFeature({
         isLoaded: true,
       })
     ),
-    on(customersActions.loadFailure, (state) => ({
-      ...state,
-      hasError: true,
-    })),
+    on(
+      customersActions.loadFailure,
+      (state): CustomersState => ({
+        ...state,
+        hasError: true,
+      })
+    ),
     on(
       customersActions.select,
       (state, { id }): CustomersState => ({
