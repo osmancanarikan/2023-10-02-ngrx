@@ -25,6 +25,10 @@ import { RouterModule } from '@angular/router';
 import { registerLocaleData } from '@angular/common';
 
 import localeDeAt from '@angular/common/locales/de-AT';
+import {
+  LocalStorageEffects,
+  localStorageReducer,
+} from '@eternal/core/local-storage-data';
 
 if (environment.production) {
   enableProdMode();
@@ -39,8 +43,15 @@ bootstrapApplication(AppComponent, {
       BrowserAnimationsModule,
       HttpClientModule,
       RouterModule.forRoot(appRoutes),
-      StoreModule.forRoot({}),
-      EffectsModule.forRoot([]),
+      StoreModule.forRoot(
+        {},
+        {
+          metaReducers: [
+            localStorageReducer('customers', 'holidays', 'security', 'master'),
+          ],
+        }
+      ),
+      EffectsModule.forRoot([LocalStorageEffects]),
       StoreDevtoolsModule.instrument(),
       FormlyModule.forRoot({
         extras: { lazyRender: true },

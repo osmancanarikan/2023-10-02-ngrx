@@ -1,0 +1,25 @@
+{
+  "projectType": "library",
+  "sourceRoot": "libs/core/local-storage-data/src",
+  "prefix": "eternal",
+  "targets": {
+    "test": {
+      "executor": "@nrwl/jest:jest",
+      "outputs": ["coverage/libs/core/local-storage-data"],
+      "options": {
+        "jestConfig": "libs/core/local-storage-data/jest.config.ts",
+        "passWithNoTests": true
+      }
+    },
+    "lint": {
+      "executor": "@nrwl/linter:eslint",
+      "options": {
+        "lintFilePatterns": [
+          "libs/core/local-storage-data/**/*.ts",
+          "libs/core/local-storage-data/**/*.html"
+        ]
+      }
+    }
+  },
+  "tags": ["domain:core"]
+}
