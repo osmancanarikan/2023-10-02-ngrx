@@ -3,10 +3,11 @@ import { Injectable } from '@angular/core';
 import { Holiday } from '@eternal/holidays/model';
 import { Configuration } from '@eternal/shared/config';
 import { Actions, concatLatestFrom, createEffect, ofType } from '@ngrx/effects';
-import { concatMap, filter, map, switchMap } from 'rxjs/operators';
+import { filter, map, switchMap } from 'rxjs/operators';
 import { holidaysActions } from './holidays.actions';
 import { holidaysFeature } from './holidays.reducer';
 import { Store } from '@ngrx/store';
+import { optimisticUpdate } from '@nrwl/angular';
 
 @Injectable()
 export class HolidaysEffects {
@@ -40,22 +41,26 @@ export class HolidaysEffects {
   addFavourite$ = createEffect(() => {
     return this.actions$.pipe(
       ofType(holidaysActions.addFavourite),
-      concatMap(({ id }) =>
-        this.httpClient
-          .post<void>(`${this.#baseUrl}/favourite/${id}`, {})
-          .pipe(map(() => holidaysActions.favouriteAdded({ id })))
-      )
+      optimisticUpdate({
+        run: ({ id }) =>
+          this.httpClient
+            .post<void>(`${this.#baseUrl}/favourite/${id}`, {})
+            .pipe(map(() => holidaysActions.favouriteAdded({ id }))),
+        undoAction: ({ id }) => holidaysActions.addFavouriteUndo({ id }),
+      })
     );
   });
 
   removeFavourite$ = createEffect(() => {
     return this.actions$.pipe(
       ofType(holidaysActions.removeFavourite),
-      concatMap(({ id }) =>
-        this.httpClient
-          .delete(`${this.#baseUrl}/favourite/${id}`)
-          .pipe(map(() => holidaysActions.favouriteRemoved({ id })))
-      )
+      optimisticUpdate({
+        run: ({ id }) =>
+          this.httpClient
+            .delete<void>(`${this.#baseUrl}/favourite/${id}`, {})
+            .pipe(map(() => holidaysActions.favouriteRemoved({ id }))),
+        undoAction: ({ id }) => holidaysActions.removeFavouriteUndo({ id }),
+      })
     );
   });
 

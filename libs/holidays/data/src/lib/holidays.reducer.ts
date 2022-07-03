@@ -34,16 +34,24 @@ export const holidaysFeature = createFeature({
     immerOn(holidaysActions.loaded, (state, { holidays }) => {
       safeAssign(state, { loadStatus: 'loaded', holidays });
     }),
-    immerOn(holidaysActions.favouriteAdded, (state, { id }) => {
-      if (state.favouriteIds.includes(id) === false) {
-        state.favouriteIds.push(id);
+    immerOn(
+      holidaysActions.addFavourite,
+      holidaysActions.removeFavouriteUndo,
+      (state, { id }) => {
+        if (state.favouriteIds.includes(id) === false) {
+          state.favouriteIds.push(id);
+        }
       }
-    }),
-    immerOn(holidaysActions.favouriteRemoved, (state, { id }) => {
-      const ix = state.favouriteIds.indexOf(id);
-      if (ix > -1) {
-        state.favouriteIds.splice(ix, 1);
+    ),
+    immerOn(
+      holidaysActions.removeFavourite,
+      holidaysActions.addFavouriteUndo,
+      (state, { id }) => {
+        const ix = state.favouriteIds.indexOf(id);
+        if (ix > -1) {
+          state.favouriteIds.splice(ix, 1);
+        }
       }
-    })
+    )
   ),
 });
