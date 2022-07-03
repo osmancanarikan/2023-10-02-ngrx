@@ -5,7 +5,7 @@ import {
   HttpTestingController,
 } from '@angular/common/http/testing';
 import { HolidaysComponent } from './holidays.component';
-import { StoreModule } from '@ngrx/store';
+import { Store, StoreModule } from '@ngrx/store';
 import { EffectsModule } from '@ngrx/effects';
 import { Configuration } from '@eternal/shared/config';
 import { createHolidays } from '@eternal/holidays/model';
@@ -13,6 +13,7 @@ import { createHolidays } from '@eternal/holidays/model';
 import { holidaysFeature } from '../../../../data/src/lib/holidays.reducer';
 // eslint-disable-next-line @nrwl/nx/enforce-module-boundaries
 import { HolidaysEffects } from '../../../../data/src/lib/holidays.effects';
+import { holidaysActions } from '@eternal/holidays/data';
 
 describe('Request Info Component', () => {
   const setup = async () =>
@@ -44,6 +45,7 @@ describe('Request Info Component', () => {
   it('should show holiday cards', fakeAsync(async () => {
     await setup();
     const controller = TestBed.inject(HttpTestingController);
+    TestBed.inject(Store).dispatch(holidaysActions.get());
     const holidays = createHolidays({ title: 'Vienna' }, { title: 'London' });
     controller.expectOne((req) => !!req.url.match(/holiday/)).flush(holidays);
 
