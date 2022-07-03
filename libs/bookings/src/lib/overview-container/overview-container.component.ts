@@ -22,12 +22,7 @@ export class OverviewContainerComponent {
     loaded: this.bookingsRepository.loaded$,
     customer: this.customersApi.selectedCustomer$,
   }).pipe(
-    filter(({ loaded }) => {
-      if (loaded === false) {
-        this.bookingsRepository.load();
-      }
-      return loaded;
-    }),
+    filter(({ loaded }) => loaded),
     map(({ customer, bookings }) => ({
       customerName: `${customer.name}, ${customer.firstname}`,
       bookings,
