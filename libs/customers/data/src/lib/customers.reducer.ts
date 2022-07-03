@@ -7,6 +7,7 @@ export interface CustomersState {
   page: number;
   total: number;
   selectedId: number | undefined;
+  isLoaded: boolean;
 }
 
 export const initialState: CustomersState = {
@@ -14,6 +15,7 @@ export const initialState: CustomersState = {
   page: 0,
   total: 0,
   selectedId: undefined,
+  isLoaded: false,
 };
 
 export const customersFeature = createFeature({
@@ -22,17 +24,18 @@ export const customersFeature = createFeature({
     initialState,
     on(
       customersActions.load,
-      (state): CustomersState => ({
+      (state, { page }): CustomersState => ({
         ...state,
+        page,
       })
     ),
     on(
       customersActions.loaded,
-      (state, { customers, total, page }): CustomersState => ({
+      (state, { customers, total }): CustomersState => ({
         ...state,
         customers,
         total,
-        page,
+        isLoaded: true,
       })
     ),
     on(

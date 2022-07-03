@@ -39,6 +39,6 @@ export class CustomersContainerComponent {
   }
 
   switchPage(page: number) {
-    console.log('switch to page ' + page + ' is not implemented');
+    this.customersRepository.get(page + 1);
   }
 }

@@ -4,6 +4,8 @@ import { createActionGroup, emptyProps, props } from '@ngrx/store';
 export const customersActions = createActionGroup({
   source: 'Customers',
   events: {
+    Init: emptyProps(),
+    Get: props<{ page: number }>(),
     Load: props<{ page: number }>(),
     Loaded: props<{ customers: Customer[]; total: number; page: number }>(),
     Add: props<{ customer: Customer }>(),
