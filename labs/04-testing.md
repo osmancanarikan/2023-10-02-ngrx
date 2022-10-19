@@ -136,6 +136,7 @@ describe('Customer Effects', () => {
   let configuration: Mock<Configuration>;
   let router: Mock<Router>;
   let messageService: Mock<MessageService>;
+  let restoreMock: RestoreFunction;
 
   beforeEach(() => {
     httpClient = createMock(HttpClient);
@@ -145,15 +146,19 @@ describe('Customer Effects', () => {
     messageService = createMock(MessageService);
   });
 
-  const createEffect = (actions$: Observable<Action>) =>
-    new CustomersEffects(
-      actions$,
-      httpClient,
-      router,
-      store,
-      configuration,
-      messageService
-    );
+  afterEach(() => restoreMock);
+
+  const createEffect = (actions$: Observable<Action>) => {
+    restoreMock = safeMockInject
+      .with(Actions, actions$)
+      .with(HttpClient, httpClient)
+      .with(Router, router)
+      .with(Store, store)
+      .with(Configuration, configuration)
+      .with(MessageService, messageService)
+      .getRestoreFn();
+    return new CustomersEffects();
+  };
 
   describe('init', () => {
     it('should  dispatch get if not loaded', async () => {
