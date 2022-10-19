@@ -64,6 +64,7 @@
                   "type:shared:config",
                   "type:shared:ui-messaging",
                   "type:shared:ngrx-utils",
+                  "type:shared:testing",
                   "type:shared:util"
                 ]
               },
