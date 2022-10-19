@@ -11,7 +11,7 @@ export const customersRoutes: Routes = [
     path: '',
     canActivate: [DataGuard],
     component: CustomersRootComponent,
-    providers: [customersDataProvider],
+    providers: customersDataProvider,
     children: [
       {
         path: '',

@@ -19,7 +19,6 @@ describe('Request Info Component', () => {
   const setup = async () =>
     render(HolidaysComponent, {
       imports: [
-        HolidaysComponent,
         StoreModule.forRoot({}),
         EffectsModule.forRoot([]),
         HttpClientTestingModule,

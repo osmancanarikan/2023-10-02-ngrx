@@ -1,9 +1,9 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Holiday } from '@eternal/holidays/model';
 import { fromHolidays, holidaysActions } from '@eternal/holidays/data';
-import { CommonModule } from '@angular/common';
 import { HolidayCardComponent } from '@eternal/holidays/ui';
+import { AsyncPipe, NgForOf } from '@angular/common';
 
 @Component({
   selector: 'eternal-holidays',
@@ -18,19 +18,19 @@ import { HolidayCardComponent } from '@eternal/holidays/ui';
       </eternal-holiday-card>
     </div> `,
   standalone: true,
-  imports: [CommonModule, HolidayCardComponent],
+  imports: [AsyncPipe, HolidayCardComponent, NgForOf],
 })
 export class HolidaysComponent {
-  holidays$ = this.store.select(fromHolidays.selectHolidaysWithFavourite);
+  #store = inject(Store);
 
-  constructor(private store: Store) {}
+  holidays$ = this.#store.select(fromHolidays.selectHolidaysWithFavourite);
 
   addFavourite(id: number) {
-    this.store.dispatch(holidaysActions.addFavourite({ id }));
+    this.#store.dispatch(holidaysActions.addFavourite({ id }));
   }
 
   removeFavourite(id: number) {
-    this.store.dispatch(holidaysActions.removeFavourite({ id }));
+    this.#store.dispatch(holidaysActions.removeFavourite({ id }));
   }
 
   byId(index: number, holiday: Holiday) {
