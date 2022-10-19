@@ -1,7 +1,7 @@
 import { Component, Input } from '@angular/core';
-import { Booking } from '../+state/bookings.reducer';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
-import { CommonModule } from '@angular/common';
+import { Booking } from '../+state/bookings.reducer';
+import { DatePipe, NgIf } from '@angular/common';
 
 export interface ViewModel {
   bookings: Booking[];
@@ -12,7 +12,7 @@ export interface ViewModel {
   selector: 'eternal-overview',
   templateUrl: './overview.component.html',
   standalone: true,
-  imports: [MatTableModule, CommonModule],
+  imports: [MatTableModule, DatePipe, NgIf],
 })
 export class OverviewComponent {
   @Input() viewModel: ViewModel | undefined;
