@@ -1,5 +1,5 @@
-import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { AsyncPipe, NgStyle } from '@angular/common';
+import { Component, inject } from '@angular/core';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { LoadingService } from './loading.service';
 
@@ -12,8 +12,8 @@ import { LoadingService } from './loading.service';
     mode="indeterminate"
   ></mat-progress-bar>`,
   standalone: true,
-  imports: [CommonModule, MatProgressBarModule],
+  imports: [MatProgressBarModule, NgStyle, AsyncPipe],
 })
 export class LoaderComponent {
-  constructor(public loadingService: LoadingService) {}
+  loadingService = inject(LoadingService);
 }

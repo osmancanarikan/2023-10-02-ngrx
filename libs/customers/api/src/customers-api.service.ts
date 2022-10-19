@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { CustomersRepository } from '@eternal/customers/data';
 import { Observable } from 'rxjs';
 import { Customer } from '@eternal/customers/model';
@@ -8,6 +8,5 @@ import { Customer } from '@eternal/customers/model';
 })
 export class CustomersApi {
   readonly selectedCustomer$: Observable<Customer> =
-    this.customersRepository.selectedCustomer$;
-  constructor(private customersRepository: CustomersRepository) {}
+    inject(CustomersRepository).selectedCustomer$;
 }
