@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Customer } from '@eternal/customers/model';
@@ -7,7 +6,8 @@ import { Options } from '@eternal/shared/form';
 import { selectCountries } from '@eternal/shared/master-data';
 import { Store } from '@ngrx/store';
 import { combineLatest, Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { map } from 'rxjs';
+import { AsyncPipe, NgIf } from '@angular/common';
 import { CustomersRepository } from '@eternal/customers/data';
 
 @Component({
@@ -21,7 +21,7 @@ import { CustomersRepository } from '@eternal/customers/data';
     (remove)="this.remove($event)"
   ></eternal-customer>`,
   standalone: true,
-  imports: [CommonModule, CustomerComponent],
+  imports: [CustomerComponent, NgIf, AsyncPipe],
 })
 export class EditCustomerComponent {
   data$: Observable<{ customer: Customer; countries: Options }>;

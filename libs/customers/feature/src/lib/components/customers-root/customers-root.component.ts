@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { Router, RouterModule } from '@angular/router';
+import { Router, RouterOutlet } from '@angular/router';
 import { CustomersRepository } from '@eternal/customers/data';
 import { MessageService } from '@eternal/shared/ui-messaging';
 import { first } from 'rxjs';
@@ -10,7 +10,7 @@ import { MatButtonModule } from '@angular/material/button';
 @Component({
   templateUrl: './customers-root.component.html',
   standalone: true,
-  imports: [RouterModule, LetModule, MatButtonModule, MatIconModule],
+  imports: [RouterOutlet, LetModule, MatButtonModule, MatIconModule],
 })
 export class CustomersRootComponent {
   constructor(

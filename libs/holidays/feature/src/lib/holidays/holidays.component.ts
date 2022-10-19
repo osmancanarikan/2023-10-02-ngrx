@@ -1,38 +1,39 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { Holiday } from '@eternal/holidays/model';
 import { fromHolidays, holidaysActions } from '@eternal/holidays/data';
-import { CommonModule } from '@angular/common';
 import { HolidayCardComponent } from '@eternal/holidays/ui';
-import { MatButtonModule } from '@angular/material/button';
+import { AsyncPipe, NgForOf } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { LetModule } from '@ngrx/component';
+import { MatButtonModule } from '@angular/material/button';
 
 @Component({
   selector: 'eternal-holidays',
   templateUrl: './holidays.component.html',
   standalone: true,
   imports: [
-    CommonModule,
-    MatIconModule,
-    MatButtonModule,
-    LetModule,
+    AsyncPipe,
     HolidayCardComponent,
+    NgForOf,
+    MatIconModule,
+    LetModule,
+    MatButtonModule,
   ],
 })
 export class HolidaysComponent {
-  holidays$ = this.store.select(fromHolidays.selectHolidaysWithFavourite);
-  canUndo$ = this.store.select(fromHolidays.selectCanUndo());
-  canRedo$ = this.store.select(fromHolidays.selectCanRedo());
+  #store = inject(Store);
 
-  constructor(private store: Store) {}
+  holidays$ = this.#store.select(fromHolidays.selectHolidaysWithFavourite);
+  canUndo$ = this.#store.select(fromHolidays.selectCanUndo());
+  canRedo$ = this.#store.select(fromHolidays.selectCanRedo());
 
   addFavourite(id: number) {
-    this.store.dispatch(holidaysActions.addFavourite({ id }));
+    this.#store.dispatch(holidaysActions.addFavourite({ id }));
   }
 
   removeFavourite(id: number) {
-    this.store.dispatch(holidaysActions.removeFavourite({ id }));
+    this.#store.dispatch(holidaysActions.removeFavourite({ id }));
   }
 
   byId(index: number, holiday: Holiday) {
@@ -40,10 +41,10 @@ export class HolidaysComponent {
   }
 
   handleUndo() {
-    this.store.dispatch(holidaysActions.undo());
+    this.#store.dispatch(holidaysActions.undo());
   }
 
   handleRedo() {
-    this.store.dispatch(holidaysActions.redo());
+    this.#store.dispatch(holidaysActions.redo());
   }
 }
