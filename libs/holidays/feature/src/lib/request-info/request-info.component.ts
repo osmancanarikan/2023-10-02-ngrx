@@ -3,24 +3,25 @@ import { NonNullableFormBuilder, ReactiveFormsModule } from '@angular/forms';
 import { Observable, Subject } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
 import { AddressLookuper } from '../address-lookuper.service';
-import { CommonModule } from '@angular/common';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { assertDefined } from '@eternal/shared/util';
+import { AsyncPipe, NgIf } from '@angular/common';
 
 @Component({
   selector: 'eternal-request-info',
   templateUrl: './request-info.component.html',
   standalone: true,
   imports: [
-    CommonModule,
     ReactiveFormsModule,
     MatFormFieldModule,
     MatIconModule,
     MatInputModule,
     MatButtonModule,
+    AsyncPipe,
+    NgIf,
   ],
 })
 export class RequestInfoComponent implements OnInit {

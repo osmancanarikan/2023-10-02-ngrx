@@ -4,13 +4,14 @@ import { ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { FormlyFieldConfig, FormlyModule } from '@ngx-formly/core';
 import { formly } from 'ngx-formly-helpers';
-import { CommonModule } from '@angular/common';
+import { NgIf } from '@angular/common';
+import { MatButtonModule } from '@angular/material/button';
 
 @Component({
   selector: 'eternal-activate',
   templateUrl: './activate.component.html',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormlyModule],
+  imports: [ReactiveFormsModule, FormlyModule, MatButtonModule, NgIf],
 })
 export class ActivateComponent {
   #route = inject(ActivatedRoute);

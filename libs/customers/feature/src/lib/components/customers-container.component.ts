@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+import { AsyncPipe, NgIf } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { CustomersComponent, CustomersViewModel } from '@eternal/customers/ui';
 import { createSelector, Store } from '@ngrx/store';
@@ -15,7 +15,7 @@ import { Observable } from 'rxjs';
     (switchPage)="switchPage($event)"
   ></eternal-customers>`,
   standalone: true,
-  imports: [CommonModule, CustomersComponent],
+  imports: [CustomersComponent, NgIf, AsyncPipe],
 })
 export class CustomersContainerComponent {
   #store = inject(Store);

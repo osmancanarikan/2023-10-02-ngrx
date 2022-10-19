@@ -5,13 +5,13 @@ import { filter } from 'rxjs';
 import { bookingsActions } from '../+state/bookings.actions';
 import { Booking } from '../+state/bookings.reducer';
 import { fromBookings } from '../+state/bookings.selectors';
-import { CommonModule } from '@angular/common';
+import { DatePipe } from '@angular/common';
 
 @Component({
   selector: 'eternal-overview',
   templateUrl: './overview.component.html',
   standalone: true,
-  imports: [MatTableModule, CommonModule],
+  imports: [MatTableModule, DatePipe],
 })
 export class OverviewComponent implements OnInit {
   userName = '';

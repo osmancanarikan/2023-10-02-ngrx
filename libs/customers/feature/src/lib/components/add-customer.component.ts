@@ -1,4 +1,4 @@
-import { CommonModule } from '@angular/common';
+import { AsyncPipe, NgIf } from '@angular/common';
 import { Component, inject } from '@angular/core';
 import { Customer } from '@eternal/customers/model';
 import { selectCountries } from '@eternal/shared/master-data';
@@ -16,7 +16,7 @@ import { CustomerComponent } from '@eternal/customers/ui';
     [showDeleteButton]="false"
   ></eternal-customer>`,
   standalone: true,
-  imports: [CustomerComponent, CommonModule],
+  imports: [CustomerComponent, NgIf, AsyncPipe],
 })
 export class AddCustomerComponent {
   #store = inject(Store);

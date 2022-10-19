@@ -3,7 +3,7 @@ import { ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
 import { SecurityService } from '@eternal/shared/security';
 import { FormlyFieldConfig, FormlyModule } from '@ngx-formly/core';
 import { formly } from 'ngx-formly-helpers';
-import { CommonModule } from '@angular/common';
+import { AsyncPipe, NgIf } from '@angular/common';
 import { FormlyMaterialModule } from '@ngx-formly/material';
 import { MatButtonModule } from '@angular/material/button';
 
@@ -12,11 +12,12 @@ import { MatButtonModule } from '@angular/material/button';
   templateUrl: './sign-in.component.html',
   standalone: true,
   imports: [
-    CommonModule,
     ReactiveFormsModule,
     FormlyModule,
     FormlyMaterialModule,
     MatButtonModule,
+    AsyncPipe,
+    NgIf,
   ],
 })
 export class SignInComponent {
