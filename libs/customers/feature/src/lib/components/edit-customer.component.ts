@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common';
 import { Component } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Customer } from '@eternal/customers/model';
@@ -10,6 +9,7 @@ import { combineLatest, Observable } from 'rxjs';
 import { filter, map } from 'rxjs/operators';
 import { customersActions } from '../+state/customers.actions';
 import { fromCustomers } from '../+state/customers.selectors';
+import { AsyncPipe, NgIf } from '@angular/common';
 
 @Component({
   selector: 'eternal-edit-customer',
@@ -21,7 +21,7 @@ import { fromCustomers } from '../+state/customers.selectors';
     (remove)="this.remove($event)"
   ></eternal-customer>`,
   standalone: true,
-  imports: [CommonModule, CustomerComponent],
+  imports: [CustomerComponent, NgIf, AsyncPipe],
 })
 export class EditCustomerComponent {
   data$: Observable<{ customer: Customer; countries: Options }>;
@@ -36,7 +36,7 @@ export class EditCustomerComponent {
         )
       )
       .pipe(
-        this.verifyCustomer,
+        this.#verifyCustomer,
         map((customer) => {
           this.customerId = customer.id;
           return { ...customer };
@@ -65,7 +65,7 @@ export class EditCustomerComponent {
     );
   }
 
-  private verifyCustomer(customer$: Observable<undefined | Customer>) {
+  #verifyCustomer(customer$: Observable<undefined | Customer>) {
     function customerGuard(
       customer: undefined | Customer
     ): customer is Customer {
