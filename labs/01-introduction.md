@@ -26,10 +26,8 @@ Run the linter afterwards, to verify that everything is alright.
 Generate a data library with
 
 ```bash
-npx nx g @nrwl/angular:library data --directory customers
+npx nx g @nrwl/angular:library data --directory customers --standalone
 ```
-
-Remove the generated NgModule. We are on standalone.
 
 **2. Move files**
 
@@ -37,21 +35,20 @@ Move all NgRx files from `customers-feature` (directory +state) to the newly gen
 
 **3. Provide the NgRx modules in `customers-data`**
 
-The newly created `customers-data` should be responsible to provide and setup the `[Store|Effects]Module`. Move them over from `customers-feature`.
+The newly created `customers-data` should be responsible to provide and setup the NgRx-related services (new provider functions). Move them over from `customers-feature`.
 
 _customers-data: customers-data.provider.ts_
 
 ```typescript
-import { importProvidersFrom } from '@angular/core';
 import { CustomersEffects } from './customers.effects';
-import { EffectsModule } from '@ngrx/effects';
-import { StoreModule } from '@ngrx/store';
+import { provideEffects } from '@ngrx/effects';
+import { provideState } from '@ngrx/store';
 import { customersFeature } from './customers.reducer';
 
-export const customersDataProvider = importProvidersFrom(
-  StoreModule.forFeature(customersFeature),
-  EffectsModule.forFeature([CustomersEffects])
-);
+export const customersDataProvider = [
+  provideState(customersFeature),
+  provideEffects([CustomersEffects]),
+];
 ```
 
 _customers-data: index.ts_
@@ -70,7 +67,7 @@ export const customersRoutes: Routes = [
     path: '',
     canActivate: [DataGuard],
     component: CustomersRootComponent,
-    providers: [customersDataProvider], // <-- updated providers property
+    providers: customersDataProvider, // <-- updated providers property
     children: [
       // ...
     ],
