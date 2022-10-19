@@ -20,8 +20,12 @@ export class MockInject {
     return this;
   }
 
-  reset() {
+  restore(): void {
     this.spy.mockRestore();
+  }
+
+  getRestoreFn() {
+    return () => this.restore();
   }
 }
 
@@ -45,3 +49,5 @@ export const safeMockInject = {
     return instance.with(token, mock);
   },
 };
+
+export type RestoreFunction = () => void;
