@@ -6,7 +6,7 @@ import { holidaysDataProvider } from '@eternal/holidays/data';
 export const holidaysRoutes: Routes = [
   {
     path: '',
-    providers: [holidaysDataProvider],
+    providers: holidaysDataProvider,
     children: [
       {
         path: '',

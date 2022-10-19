@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 // eslint-disable-next-line @nrwl/nx/enforce-module-boundaries
 import { selectSelectedCustomer } from '@eternal/customers/feature';
 import { Actions, concatLatestFrom, createEffect, ofType } from '@ngrx/effects';
@@ -38,16 +38,14 @@ bookings.set(3, [
 
 @Injectable()
 export class BookingsEffects {
-  constructor(
-    private httpClient: HttpClient,
-    private actions$: Actions,
-    private store: Store
-  ) {}
+  #httpClient = inject(HttpClient);
+  #actions$ = inject(Actions);
+  #store = inject(Store);
 
   load$ = createEffect(() => {
-    return this.actions$.pipe(
+    return this.#actions$.pipe(
       ofType(bookingsActions.load),
-      concatLatestFrom(() => this.store.select(selectSelectedCustomer)),
+      concatLatestFrom(() => this.#store.select(selectSelectedCustomer)),
       map(([, customerId]) => customerId),
       filter(Boolean),
       map((customer) =>
