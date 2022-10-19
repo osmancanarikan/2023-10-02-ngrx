@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { selectSelectedCustomer } from '@eternal/customers/api';
 import { Actions, concatLatestFrom, createEffect, ofType } from '@ngrx/effects';
 import { Store } from '@ngrx/store';
@@ -37,16 +37,14 @@ bookings.set(3, [
 
 @Injectable()
 export class BookingsEffects {
-  constructor(
-    private httpClient: HttpClient,
-    private actions$: Actions,
-    private store: Store
-  ) {}
+  #httpClient = inject(HttpClient);
+  #actions$ = inject(Actions);
+  #store = inject(Store);
 
   load$ = createEffect(() => {
-    return this.actions$.pipe(
+    return this.#actions$.pipe(
       ofType(bookingsActions.load),
-      concatLatestFrom(() => this.store.select(selectSelectedCustomer)),
+      concatLatestFrom(() => this.#store.select(selectSelectedCustomer)),
       map(([, customerId]) => customerId),
       filter(Boolean),
       map((customer) =>
