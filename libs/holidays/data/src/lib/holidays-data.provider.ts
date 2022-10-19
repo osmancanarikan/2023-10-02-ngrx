@@ -1,10 +1,9 @@
-import { importProvidersFrom } from '@angular/core';
-import { StoreModule } from '@ngrx/store';
+import { provideState } from '@ngrx/store';
 import { holidaysFeature } from './holidays.reducer';
-import { EffectsModule } from '@ngrx/effects';
+import { provideEffects } from '@ngrx/effects';
 import { HolidaysEffects } from './holidays.effects';
 
-export const holidaysDataProvider = importProvidersFrom(
-  StoreModule.forFeature(holidaysFeature),
-  EffectsModule.forFeature([HolidaysEffects])
-);
+export const holidaysDataProvider = [
+  provideState(holidaysFeature),
+  provideEffects([HolidaysEffects]),
+];

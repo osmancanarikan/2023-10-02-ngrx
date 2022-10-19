@@ -1,5 +1,5 @@
 import { createSelector } from '@ngrx/store';
-import { securityFeature } from './securityState';
+import { securityFeature } from './security.reducer';
 
 const { selectUser, selectLoaded } = securityFeature;
 

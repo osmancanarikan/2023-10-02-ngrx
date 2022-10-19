@@ -1,5 +1,5 @@
 import { CanActivate, UrlTree } from '@angular/router';
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { fromHolidays, holidaysActions } from '@eternal/holidays/data';
 import { Store } from '@ngrx/store';
 import { filter } from 'rxjs/operators';
@@ -9,9 +9,12 @@ import { Observable } from 'rxjs';
   providedIn: 'root',
 })
 export class HolidaysDataGuard implements CanActivate {
-  constructor(private store: Store) {}
+  #store = inject(Store);
+
   canActivate(): Observable<boolean | UrlTree> {
-    this.store.dispatch(holidaysActions.get());
-    return this.store.select(fromHolidays.selectIsLoaded).pipe(filter(Boolean));
+    this.#store.dispatch(holidaysActions.get());
+    return this.#store
+      .select(fromHolidays.selectIsLoaded)
+      .pipe(filter(Boolean));
   }
 }
