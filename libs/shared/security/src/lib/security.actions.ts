@@ -1,5 +1,5 @@
 import { createActionGroup, emptyProps, props } from '@ngrx/store';
-import { User } from './securityState';
+import { User } from './security.reducer';
 
 export const securityActions = createActionGroup({
   source: 'Security',

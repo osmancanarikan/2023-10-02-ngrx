@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Component, ViewChild, ViewEncapsulation } from '@angular/core';
+import { Component, inject, ViewChild, ViewEncapsulation } from '@angular/core';
 import { MatStepper, MatStepperModule } from '@angular/material/stepper';
 import { Router } from '@angular/router';
 import { BasicComponent, BasicData } from './basic/basic.component';
@@ -54,7 +54,8 @@ export class SignUpComponent {
     },
   };
 
-  constructor(private httpClient: HttpClient, private router: Router) {}
+  #httpClient = inject(HttpClient);
+  #router = inject(Router);
 
   nextBasic(basicData: BasicData) {
     if (!this.stepper) {
@@ -83,7 +84,7 @@ export class SignUpComponent {
 
   finish() {
     const { email, password, firstname, name } = this.signUpData.detail;
-    this.httpClient
+    this.#httpClient
       .post<{ userId: number }>('/security/sign-up', {
         email,
         password,
@@ -91,11 +92,11 @@ export class SignUpComponent {
         name,
       })
       .subscribe(({ userId }) => {
-        const urlTree = this.router.createUrlTree([
+        const urlTree = this.#router.createUrlTree([
           '/security/activate',
           userId,
         ]);
-        this.router.navigateByUrl(urlTree);
+        this.#router.navigateByUrl(urlTree);
       });
   }
 }

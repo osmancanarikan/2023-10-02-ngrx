@@ -1,5 +1,5 @@
-import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { AsyncPipe, NgIf } from '@angular/common';
+import { Component, inject } from '@angular/core';
 import { CustomersComponent, CustomersViewModel } from '@eternal/customers/ui';
 import { createSelector, Store } from '@ngrx/store';
 import { Observable } from 'rxjs';
@@ -14,10 +14,13 @@ import { CustomersRepository, fromCustomers } from '@eternal/customers/data';
     (switchPage)="switchPage($event)"
   ></eternal-customers>`,
   standalone: true,
-  imports: [CommonModule, CustomersComponent],
+  imports: [CustomersComponent, NgIf, AsyncPipe],
 })
 export class CustomersContainerComponent {
-  viewModel$: Observable<CustomersViewModel> = this.store.select(
+  #customersRepository = inject(CustomersRepository);
+  #store = inject(Store);
+
+  viewModel$: Observable<CustomersViewModel> = this.#store.select(
     createSelector(fromCustomers.selectPagedCustomers, (pagedCustomers) => ({
       customers: pagedCustomers.customers,
       pageIndex: pagedCustomers.page - 1,
@@ -25,20 +28,15 @@ export class CustomersContainerComponent {
     }))
   );
 
-  constructor(
-    private customersRepository: CustomersRepository,
-    private store: Store
-  ) {}
-
   setSelected(id: number) {
-    this.customersRepository.select(id);
+    this.#customersRepository.select(id);
   }
 
   setUnselected() {
-    this.customersRepository.unselect();
+    this.#customersRepository.unselect();
   }
 
   switchPage(page: number) {
-    this.customersRepository.get(page + 1);
+    this.#customersRepository.get(page + 1);
   }
 }

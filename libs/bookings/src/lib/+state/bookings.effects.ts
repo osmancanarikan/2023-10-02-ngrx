@@ -1,6 +1,6 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { createEffect } from '@ngrx/effects';
-import { map, pluck } from 'rxjs';
+import { map } from 'rxjs';
 import { Booking } from './bookings.reducer';
 import { CustomersApi } from '@eternal/customers/api';
 import { bookingsActions } from './bookings.actions';
@@ -35,12 +35,11 @@ bookings.set(3, [
 
 @Injectable()
 export class BookingsEffects {
-  constructor(private customersApi: CustomersApi) {}
+  #customersApi = inject(CustomersApi);
 
   selectedCustomer$ = createEffect(() => {
-    return this.customersApi.selectedCustomer$.pipe(
-      pluck('id'),
-      map((id) => bookingsActions.loaded({ bookings: bookings.get(id) || [] }))
+    return this.#customersApi.selectedCustomer$.pipe(
+      map(({id}) => bookingsActions.loaded({ bookings: bookings.get(id) || [] }))
     );
   });
 }

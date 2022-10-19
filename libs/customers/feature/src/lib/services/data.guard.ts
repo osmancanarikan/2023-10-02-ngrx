@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { CanActivate } from '@angular/router';
 import { CustomersRepository } from '@eternal/customers/data';
 
@@ -6,10 +6,10 @@ import { CustomersRepository } from '@eternal/customers/data';
   providedIn: 'root',
 })
 export class DataGuard implements CanActivate {
-  constructor(private customersRepository: CustomersRepository) {}
+  #customersRepository = inject(CustomersRepository);
 
   canActivate(): boolean {
-    this.customersRepository.init();
+    this.#customersRepository.init();
     return true;
   }
 }

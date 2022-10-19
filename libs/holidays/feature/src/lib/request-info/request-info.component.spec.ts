@@ -25,8 +25,7 @@ const mockLookup = (query: string, response: unknown[]) => {
 describe('Request Info Component', () => {
   const setup = async (address: string = '') =>
     render(RequestInfoComponent, {
-      imports: [RequestInfoComponent, HttpClientTestingModule],
-      excludeComponentDeclaration: true,
+      imports: [HttpClientTestingModule],
       componentProperties: { address },
     });
 
@@ -35,7 +34,7 @@ describe('Request Info Component', () => {
     await screen.findByText('Request More Information');
   }));
 
-  it('should search multiple times', fakeAsync(async () => {
+  it('should search multiple times', async () => {
     await setup();
 
     await userEvent.type(ui.address(), 'Domgasse 15');
@@ -48,10 +47,10 @@ describe('Request Info Component', () => {
     await userEvent.click(ui.search());
     mockLookup('Domgasse 15', [true]);
     await screen.findByText('Brochure sent');
-  }));
+  });
 
-  it('should set the address field if given by parent', fakeAsync(async () => {
+  it('should set the address field if given by parent', async () => {
     await setup('Domgasse 5');
     await screen.findByDisplayValue('Domgasse 5');
-  }));
+  });
 });
