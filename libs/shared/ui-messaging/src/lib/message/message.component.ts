@@ -39,6 +39,7 @@ import { CommonModule } from '@angular/common';
 export class MessageComponent {
   flag = true;
   state = 'fadeInFlash';
+
   constructor(messageStore: MessageStore) {
     messageStore.messages$.subscribe((message) => {
       this.messages.push(message);

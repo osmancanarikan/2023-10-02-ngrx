@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { Store } from '@ngrx/store';
 import { filter } from 'rxjs';
@@ -18,15 +18,15 @@ export class OverviewComponent implements OnInit {
   displayedColumns = ['holidayId', 'date', 'status', 'comment'];
   dataSource = new MatTableDataSource<Booking>([]);
 
-  constructor(private store: Store) {}
+  #store = inject(Store);
 
   ngOnInit(): void {
-    this.store
+    this.#store
       .select(fromBookings.selectBookingData)
       .pipe(filter(Boolean))
       .subscribe((bookingData) => {
         if (bookingData?.loaded === false) {
-          this.store.dispatch(bookingsActions.load());
+          this.#store.dispatch(bookingsActions.load());
         } else {
           this.userName = bookingData.customerName;
           this.dataSource.data = bookingData.bookings;

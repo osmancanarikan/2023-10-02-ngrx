@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { holidaysActions } from '../+state/holidays.actions';
 import { fromHolidays } from '../+state/holidays.selectors';
@@ -22,20 +22,19 @@ import { CommonModule } from '@angular/common';
   imports: [CommonModule, HolidayCardComponent],
 })
 export class HolidaysComponent implements OnInit {
-  holidays$ = this.store.select(fromHolidays.selectHolidaysWithFavourite);
-
-  constructor(private store: Store) {}
+  #store = inject(Store);
+  holidays$ = this.#store.select(fromHolidays.selectHolidaysWithFavourite);
 
   ngOnInit(): void {
-    this.store.dispatch(holidaysActions.load());
+    this.#store.dispatch(holidaysActions.load());
   }
 
   addFavourite(id: number) {
-    this.store.dispatch(holidaysActions.addFavourite({ id }));
+    this.#store.dispatch(holidaysActions.addFavourite({ id }));
   }
 
   removeFavourite(id: number) {
-    this.store.dispatch(holidaysActions.removeFavourite({ id }));
+    this.#store.dispatch(holidaysActions.removeFavourite({ id }));
   }
 
   byId(index: number, holiday: Holiday) {

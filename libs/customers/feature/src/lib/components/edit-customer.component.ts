@@ -36,7 +36,7 @@ export class EditCustomerComponent {
         )
       )
       .pipe(
-        this.verifyCustomer,
+        this.#verifyCustomer,
         map((customer) => {
           this.customerId = customer.id;
           return { ...customer };
@@ -65,7 +65,7 @@ export class EditCustomerComponent {
     );
   }
 
-  private verifyCustomer(customer$: Observable<undefined | Customer>) {
+  #verifyCustomer(customer$: Observable<undefined | Customer>) {
     function customerGuard(
       customer: undefined | Customer
     ): customer is Customer {

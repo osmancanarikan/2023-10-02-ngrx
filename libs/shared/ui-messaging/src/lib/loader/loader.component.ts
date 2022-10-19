@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { LoadingService } from './loading.service';
 
@@ -15,5 +15,5 @@ import { LoadingService } from './loading.service';
   imports: [CommonModule, MatProgressBarModule],
 })
 export class LoaderComponent {
-  constructor(public loadingService: LoadingService) {}
+  loadingService = inject(LoadingService);
 }

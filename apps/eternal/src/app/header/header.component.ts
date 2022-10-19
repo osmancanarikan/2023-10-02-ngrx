@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { MatButtonModule } from '@angular/material/button';
 import { RouterModule } from '@angular/router';
 import { SecurityService } from '@eternal/shared/security';
@@ -12,11 +12,10 @@ import { SecurityService } from '@eternal/shared/security';
   imports: [CommonModule, MatButtonModule, RouterModule],
 })
 export class HeaderComponent {
-  user$ = this.userService.getLoadedUser$();
-
-  constructor(private userService: SecurityService) {}
+  #userService = inject(SecurityService);
+  user$ = this.#userService.getLoadedUser$();
 
   signOut() {
-    this.userService.signOut();
+    this.#userService.signOut();
   }
 }

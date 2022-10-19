@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
 import { ActivatedRoute } from '@angular/router';
 import { FormlyFieldConfig, FormlyModule } from '@ngx-formly/core';
@@ -13,6 +13,8 @@ import { CommonModule } from '@angular/common';
   imports: [CommonModule, ReactiveFormsModule, FormlyModule],
 })
 export class ActivateComponent {
+  #route = inject(ActivatedRoute);
+  #httpClient = inject(HttpClient);
   formGroup = new UntypedFormGroup({});
   model = { terms: false, gdpr: false };
   fields: FormlyFieldConfig[] = [
@@ -20,13 +22,11 @@ export class ActivateComponent {
   ];
   message = '';
 
-  constructor(private route: ActivatedRoute, private httpClient: HttpClient) {}
-
   handleSubmit() {
     if (this.formGroup.valid) {
-      this.httpClient
+      this.#httpClient
         .post(
-          `/security/activate-user-by-code/${this.route.snapshot.paramMap.get(
+          `/security/activate-user-by-code/${this.#route.snapshot.paramMap.get(
             'id'
           )}/${this.formGroup.value.activationCode}`,
           {}

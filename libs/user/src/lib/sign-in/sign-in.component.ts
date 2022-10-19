@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
 import { SecurityService } from '@eternal/shared/security';
 import { FormlyFieldConfig, FormlyModule } from '@ngx-formly/core';
@@ -25,14 +25,13 @@ export class SignInComponent {
     formly.requiredText('email', 'EMail'),
     formly.requiredText('password', 'Password', { type: 'password' }),
   ];
-  signedIn$ = this.securityService.getSignedIn$();
-
-  constructor(private securityService: SecurityService) {}
+  #securityService = inject(SecurityService);
+  signedIn$ = this.#securityService.getSignedIn$();
 
   handleSubmit() {
     if (this.formGroup.valid) {
       const { email, password } = this.formGroup.value;
-      this.securityService.signIn(email, password);
+      this.#securityService.signIn(email, password);
     }
   }
 }
