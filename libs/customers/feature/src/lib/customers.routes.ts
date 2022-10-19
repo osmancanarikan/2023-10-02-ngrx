@@ -1,7 +1,6 @@
-import { importProvidersFrom } from '@angular/core';
 import { Routes } from '@angular/router';
-import { EffectsModule } from '@ngrx/effects';
-import { StoreModule } from '@ngrx/store';
+import { provideEffects } from '@ngrx/effects';
+import { provideState } from '@ngrx/store';
 import { CustomersEffects } from './+state/customers.effects';
 import { customersFeature } from './+state/customers.reducer';
 import { AddCustomerComponent } from './components/add-customer.component';
@@ -16,10 +15,8 @@ export const customersRoutes: Routes = [
     canActivate: [DataGuard],
     component: CustomersRootComponent,
     providers: [
-      importProvidersFrom(
-        StoreModule.forFeature(customersFeature),
-        EffectsModule.forFeature([CustomersEffects])
-      ),
+      provideState(customersFeature),
+      provideEffects([CustomersEffects]),
     ],
     children: [
       {

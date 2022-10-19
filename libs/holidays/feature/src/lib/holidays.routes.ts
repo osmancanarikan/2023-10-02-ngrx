@@ -1,7 +1,6 @@
-import { importProvidersFrom } from '@angular/core';
 import { Routes } from '@angular/router';
-import { EffectsModule } from '@ngrx/effects';
-import { StoreModule } from '@ngrx/store';
+import { provideEffects } from '@ngrx/effects';
+import { provideState } from '@ngrx/store';
 import { HolidaysEffects } from './+state/holidays.effects';
 import { holidaysFeature } from './+state/holidays.reducer';
 import { HolidaysComponent } from './holidays/holidays.component';
@@ -11,10 +10,8 @@ export const holidaysRoutes: Routes = [
   {
     path: '',
     providers: [
-      importProvidersFrom(
-        StoreModule.forFeature(holidaysFeature),
-        EffectsModule.forFeature([HolidaysEffects])
-      ),
+      provideState(holidaysFeature),
+      provideEffects([HolidaysEffects]),
     ],
     children: [
       {
