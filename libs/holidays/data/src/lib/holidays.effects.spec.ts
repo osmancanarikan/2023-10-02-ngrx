@@ -8,18 +8,30 @@ import { Store } from '@ngrx/store';
 import { createHolidays } from '@eternal/holidays/model';
 import { createMock, Mock } from '@testing-library/angular/jest-utils';
 import { marbles } from 'rxjs-marbles/jest';
+import { RestoreFunction, safeMockInject } from '@eternal/shared/testing';
 
 describe('Holidays Effects', () => {
   let httpClient: Mock<HttpClient>;
   const config = new Configuration('https://www.host.com/');
   let store: Mock<Store>;
+  let restoreMock: RestoreFunction;
 
   beforeEach(() => {
     httpClient = createMock(HttpClient);
     store = createMock(Store);
   });
 
-  const createEffect = (actions$: Actions) => new HolidaysEffects(actions$);
+  afterEach(() => restoreMock());
+
+  const createEffect = (actions$: Actions) => {
+    restoreMock = safeMockInject
+      .with(Actions, actions$)
+      .with(HttpClient, httpClient)
+      .with(Configuration, config)
+      .with(Store, store)
+      .getRestoreFn();
+    return new HolidaysEffects();
+  };
 
   it('should load holidays', async () => {
     const holidays = createHolidays(
