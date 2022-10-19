@@ -97,9 +97,9 @@ Open _/eslintrc.json_. We have to deal with four rules.
 
 **5. Final check**
 
-- Run `npx nx run-many --target=lint --all`. This time, it should work.
+- Run `npm run full-check`. This time, it should work.
 
-- Cross check: In _holidays.components.ts_ of `holidays-feature`, add `this.store.select(selectSelectedCustomer);` to the constructor and re-run the linter. It should fail.
+- Cross-check: In _holidays.components.ts_ of `holidays-feature`, add `this.#store.select(selectSelectedCustomer);` to the constructor and re-run the linter. It should fail.
 
 </p>
 </details>
@@ -130,30 +130,30 @@ import { Customer } from '@eternal/customers/model';
 
 @Injectable({ providedIn: 'root' })
 export class CustomersRepository {
-  constructor(private store: Store) {}
+  #store = inject(Store);
 
   load(page: number = 1): void {
-    this.store.dispatch(customersActions.load({ page }));
+    this.#store.dispatch(customersActions.load({ page }));
   }
 
   add(customer: Customer): void {
-    this.store.dispatch(customersActions.add({ customer }));
+    this.#store.dispatch(customersActions.add({ customer }));
   }
 
   update(customer: Customer): void {
-    this.store.dispatch(customersActions.update({ customer }));
+    this.#store.dispatch(customersActions.update({ customer }));
   }
 
   remove(customer: Customer): void {
-    this.store.dispatch(customersActions.remove({ customer }));
+    this.#store.dispatch(customersActions.remove({ customer }));
   }
 
   select(id: number): void {
-    this.store.dispatch(customersActions.select({ id }));
+    this.#store.dispatch(customersActions.select({ id }));
   }
 
   unselect(): void {
-    this.store.dispatch(customersActions.unselect());
+    this.#store.dispatch(customersActions.unselect());
   }
 }
 ```
@@ -163,7 +163,9 @@ export class CustomersRepository {
 ```typescript
 @Injectable({ providedIn: 'root' })
 export class CustomersRepository {
-  readonly customers$: Observable<Customer[]> = this.store.select(
+  #store = inject(Store);
+
+  readonly customers$: Observable<Customer[]> = this.#store.select(
     fromCustomers.selectCustomers
   );
 
@@ -171,16 +173,14 @@ export class CustomersRepository {
     customers: (Customer & { selected: boolean })[];
     total: number;
     page: number;
-  }> = this.store.select(fromCustomers.selectPagedCustomers);
+  }> = this.#store.select(fromCustomers.selectPagedCustomers);
 
   readonly selectedCustomer$: Observable<Customer | undefined> =
-    this.store.select(fromCustomers.selectSelectedCustomer);
+    this.#store.select(fromCustomers.selectSelectedCustomer);
 
   findById(id: number): Observable<Customer | undefined> {
-    return this.store.select(fromCustomers.selectById(id));
+    return this.#store.select(fromCustomers.selectById(id));
   }
-
-  constructor(private store: Store) {}
 
   // ... methods for actions
 }
@@ -212,7 +212,7 @@ The solutions show the second approach, where architecture is favoured over perf
 Create a new file _customers-api.service.ts_ in `customers-api`:
 
 ```typescript
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { CustomersRepository } from '@eternal/customers/data';
 import { Observable } from 'rxjs';
 import { Customer } from '@eternal/customers/model';
@@ -221,9 +221,8 @@ import { Customer } from '@eternal/customers/model';
   providedIn: 'root',
 })
 export class CustomersApi {
-  readonly selectedCustomer$: Observable<Customer | undefined> =
-    this.customersRepository.selectedCustomer$;
-  constructor(private customersRepository: CustomersRepository) {}
+  readonly selectedCustomer$: Observable<Customer> =
+    inject(CustomersRepository).selectedCustomer$;
 }
 ```
 
@@ -238,12 +237,13 @@ The _index.ts_ in `customers-api` only exposes the `CustomersApi`. The selector 
 ```typescript
 @Injectable()
 export class BookingsEffects {
-  constructor(private actions$: Actions, private customersApi: CustomersApi) {}
+  #customersApi = inject(CustomersApi);
+  #actions$ = inject(Actions);
 
   load$ = createEffect(() => {
-    return this.actions$.pipe(
+    return this.#actions$.pipe(
       ofType(bookingsActions.load),
-      concatLatestFrom(() => this.customersApi.selectedCustomer$), // ← replace with this
+      concatLatestFrom(() => this.#customersApi.selectedCustomer$), // ← replace with this
       map(([, customerId]) => customerId),
       filter(Boolean),
       map((customer) =>
@@ -261,8 +261,8 @@ Create a new file _bookings-repository.service.ts_:
 ```typescript
 import { combineLatest, filter, map, Observable } from 'rxjs';
 import { Booking, bookingsFeature } from './bookings.reducer';
-import { assertDefined, isDefined } from '@eternal/shared/util';
-import { Injectable } from '@angular/core';
+import { isDefined } from '@eternal/shared/util';
+import { inject, Injectable } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { CustomersApi } from '@eternal/customers/api';
 
@@ -274,14 +274,16 @@ interface BookingData {
 
 @Injectable({ providedIn: 'root' })
 export class BookingsRepository {
+  #store = inject(Store);
+  #customersApi = inject(CustomersApi);
+
   readonly bookingsData$: Observable<BookingData> = combineLatest({
-    customer: this.customersApi.selectedCustomer$,
-    bookings: this.store.select(bookingsFeature.selectBookings),
-    loaded: this.store.select(bookingsFeature.selectLoaded),
+    customer: this.#customersApi.selectedCustomer$,
+    bookings: this.#store.select(bookingsFeature.selectBookings),
+    loaded: this.#store.select(bookingsFeature.selectLoaded),
   }).pipe(
     filter(({ customer }) => isDefined(customer)),
     map(({ customer, bookings, loaded }) => {
-      assertDefined(customer);
       return {
         customerName: customer.name + ', ' + customer.firstname,
         bookings,
@@ -289,29 +291,25 @@ export class BookingsRepository {
       };
     })
   );
-
-  constructor(private store: Store, private customersApi: CustomersApi) {}
 }
 ```
 
-4. Update your the _overview.component.ts_ too. It
+4. Update the _overview.component.ts_ too. It
 
 ```typescript
 export class OverviewComponent implements OnInit {
   // ...
 
-  constructor(
-    private store: Store,
-    private bookingsRepository: BookingsRepository
-  ) {}
+  #store = inject(Store);
+  #bookingsRepository = inject(BookingsRepository);
 
   // ...
 
   ngOnInit(): void {
     // ↓ replace with this
-    this.bookingsRepository.bookingsData$.subscribe((bookingData) => {
+    this.#bookingsRepository.bookingsData$.subscribe((bookingData) => {
       if (bookingData?.loaded === false) {
-        this.store.dispatch(load());
+        this.#store.dispatch(bookingsActions.load());
       } else {
         this.userName = bookingData.customerName;
         this.dataSource.data = bookingData.bookings;
@@ -390,8 +388,7 @@ Split up the bookings overview into a container and a presentational component. 
 Rename `OverviewComponent` into `OverviewContainerComponent` and update the folder and file names. Update `bookings-routes.ts` as well. After that, create the actual presentational component:
 
 ```bash
-# This generates a single component and a single NgModule (=SCAM)
-npx nx g scam overview --project bookings --inline-style --skip-tests --export false --inline-scam false
+npx nx g c overview --project bookings --inline-style --skip-tests --standalone
 ```
 
 _overview.component.ts_
@@ -472,16 +469,17 @@ import * as bookingsActions from './bookings.actions';
 
 @Injectable({ providedIn: 'root' })
 export class BookingsRepository {
-  readonly bookings$: Observable<Booking[]> = this.store.select(
+  #store = inject(Store);
+
+  readonly bookings$: Observable<Booking[]> = this.#store.select(
     bookingsFeature.selectBookings
   );
-  readonly loaded$: Observable<boolean> = this.store.select(
+  readonly loaded$: Observable<boolean> = this.#store.select(
     bookingsFeature.selectLoaded
   );
-  constructor(private store: Store) {}
 
   load(): void {
-    this.store.dispatch(bookingsActions.load());
+    this.#store.dispatch(bookingsActions.load());
   }
 }
 ```
@@ -509,33 +507,37 @@ export class OverviewContainerComponentModule {}
 _overview-container.component.ts_
 
 ```typescript
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { MatTableModule } from '@angular/material/table';
-import { CommonModule } from '@angular/common';
 import { BookingsRepository } from '../+state/bookings-repository.service';
 import { CustomersApi } from '@eternal/customers/api';
 import { OverviewComponent, ViewModel } from '../overview/overview.component';
 import { combineLatest, filter, map, Observable } from 'rxjs';
+import { AsyncPipe, NgIf } from '@angular/common';
+import { LetModule } from '@ngrx/component';
 
 @Component({
   selector: 'eternal-overview-container',
   template: `<eternal-overview
-    *ngIf="viewModel$ | async as viewModel"
+    *ngrxLet="viewModel$ as viewModel"
     [viewModel]="viewModel"
   ></eternal-overview>`,
   standalone: true,
-  imports: [MatTableModule, CommonModule, OverviewComponent],
+  imports: [MatTableModule, OverviewComponent, AsyncPipe, NgIf, LetModule],
 })
 export class OverviewContainerComponent {
+  #bookingsRepository = inject(BookingsRepository);
+  #customersApi = inject(CustomersApi);
+
   // we have here two bugs which we'll eliminate later...
   readonly viewModel$: Observable<ViewModel> = combineLatest({
-    bookings: this.bookingsRepository.bookings$,
-    loaded: this.bookingsRepository.loaded$,
-    customer: this.customersApi.selectedCustomer$,
+    bookings: this.#bookingsRepository.bookings$,
+    loaded: this.#bookingsRepository.loaded$,
+    customer: this.#customersApi.selectedCustomer$,
   }).pipe(
     filter(({ loaded }) => {
       if (loaded === false) {
-        this.bookingsRepository.load();
+        this.#bookingsRepository.load();
       }
       return loaded;
     }),
@@ -544,11 +546,6 @@ export class OverviewContainerComponent {
       bookings,
     }))
   );
-
-  constructor(
-    private bookingsRepository: BookingsRepository,
-    private customersApi: CustomersApi
-  ) {}
 }
 ```
 

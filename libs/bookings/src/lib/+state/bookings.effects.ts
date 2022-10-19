@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { Actions, concatLatestFrom, createEffect, ofType } from '@ngrx/effects';
 import { filter, map } from 'rxjs';
 import { Booking } from './bookings.reducer';
@@ -35,12 +35,13 @@ bookings.set(3, [
 
 @Injectable()
 export class BookingsEffects {
-  constructor(private actions$: Actions, private customersApi: CustomersApi) {}
+  #customersApi = inject(CustomersApi);
+  #actions$ = inject(Actions);
 
   load$ = createEffect(() => {
-    return this.actions$.pipe(
+    return this.#actions$.pipe(
       ofType(bookingsActions.load),
-      concatLatestFrom(() => this.customersApi.selectedCustomer$), // ← replace with this
+      concatLatestFrom(() => this.#customersApi.selectedCustomer$), // ← replace with this
       map(([, customerId]) => customerId),
       filter(Boolean),
       map((customer) =>

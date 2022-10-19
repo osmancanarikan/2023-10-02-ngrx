@@ -5,11 +5,11 @@ import { Options } from '@eternal/shared/form';
 import { FormlyFieldConfig, FormlyModule } from '@ngx-formly/core';
 import { formly } from 'ngx-formly-helpers';
 import { MatButtonModule } from '@angular/material/button';
-import { CommonModule } from '@angular/common';
 import { FormlyMatDatepickerModule } from '@ngx-formly/material/datepicker';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
-import { RouterModule } from '@angular/router';
+import { RouterLinkWithHref } from '@angular/router';
+import { NgIf } from '@angular/common';
 
 @Component({
   selector: 'eternal-customer',
@@ -19,12 +19,12 @@ import { RouterModule } from '@angular/router';
   imports: [
     ReactiveFormsModule,
     MatButtonModule,
-    CommonModule,
     FormlyModule,
     FormlyMatDatepickerModule,
     MatDatepickerModule,
     MatNativeDateModule,
-    RouterModule,
+    RouterLinkWithHref,
+    NgIf,
   ],
 })
 export class CustomerComponent implements OnInit {
