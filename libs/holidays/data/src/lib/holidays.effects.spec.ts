@@ -19,8 +19,7 @@ describe('Holidays Effects', () => {
     store = createMock(Store);
   });
 
-  const createEffect = (actions$: Actions) =>
-    new HolidaysEffects(actions$, httpClient, config, store);
+  const createEffect = (actions$: Actions) => new HolidaysEffects(actions$);
 
   it('should load holidays', async () => {
     const holidays = createHolidays(
