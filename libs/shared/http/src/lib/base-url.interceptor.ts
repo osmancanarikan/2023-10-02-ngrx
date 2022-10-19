@@ -4,13 +4,13 @@ import {
   HttpInterceptor,
   HttpRequest,
 } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { Configuration } from '@eternal/shared/config';
 import { Observable } from 'rxjs';
 
 @Injectable()
 export class BaseUrlInterceptor implements HttpInterceptor {
-  constructor(private config: Configuration) {}
+  #config = inject(Configuration);
 
   intercept(
     req: HttpRequest<unknown>,
@@ -21,7 +21,7 @@ export class BaseUrlInterceptor implements HttpInterceptor {
     }
     return next.handle(
       req.clone({
-        url: `${this.config.baseUrl}${req.url}`,
+        url: `${this.#config.baseUrl}${req.url}`,
         withCredentials: true,
       })
     );

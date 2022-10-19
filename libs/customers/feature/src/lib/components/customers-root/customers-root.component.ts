@@ -1,9 +1,9 @@
 import { Component } from '@angular/core';
-import { RouterModule } from '@angular/router';
+import { RouterOutlet } from '@angular/router';
 
 @Component({
   templateUrl: './customers-root.component.html',
   standalone: true,
-  imports: [RouterModule],
+  imports: [RouterOutlet],
 })
 export class CustomersRootComponent {}
