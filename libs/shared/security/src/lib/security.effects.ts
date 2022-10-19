@@ -3,7 +3,7 @@ import { inject, Injectable } from '@angular/core';
 import { Actions, createEffect, ofType } from '@ngrx/effects';
 import { map, switchMap } from 'rxjs/operators';
 import { securityActions } from './security.actions';
-import { User } from './securityState';
+import { User } from './security.reducer';
 
 @Injectable()
 export class SecurityEffects {

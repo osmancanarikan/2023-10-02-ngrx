@@ -4,7 +4,7 @@ import { holidaysActions } from '../+state/holidays.actions';
 import { fromHolidays } from '../+state/holidays.selectors';
 import { Holiday } from '@eternal/holidays/model';
 import { HolidayCardComponent } from '@eternal/holidays/ui';
-import { AsyncPipe } from '@angular/common';
+import { AsyncPipe, NgForOf } from '@angular/common';
 
 @Component({
   selector: 'eternal-holidays',
@@ -19,7 +19,7 @@ import { AsyncPipe } from '@angular/common';
       </eternal-holiday-card>
     </div> `,
   standalone: true,
-  imports: [AsyncPipe, HolidayCardComponent],
+  imports: [AsyncPipe, HolidayCardComponent, NgForOf],
 })
 export class HolidaysComponent implements OnInit {
   #store = inject(Store);

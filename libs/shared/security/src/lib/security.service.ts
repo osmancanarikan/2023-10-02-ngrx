@@ -3,7 +3,7 @@ import { Store } from '@ngrx/store';
 import { combineLatest, Observable } from 'rxjs';
 import { filter, map } from 'rxjs/operators';
 import { securityActions } from './security.actions';
-import { User } from './securityState';
+import { User } from './security.reducer';
 import { fromSecurity } from './security.selectors';
 
 @Injectable({ providedIn: 'root' })
