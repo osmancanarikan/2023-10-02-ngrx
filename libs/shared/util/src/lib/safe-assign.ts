@@ -1,4 +1,4 @@
-export function safeAssign<T extends {}>(
+export function safeAssign<T extends Record<string, unknown>>(
   object: T,
   changes: Partial<T> = {}
 ): void {

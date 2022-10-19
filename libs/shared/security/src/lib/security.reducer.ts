@@ -9,24 +9,24 @@ export interface User {
   anonymous: boolean;
 }
 
-export interface SecurityState {
+export interface SecurityReducer {
   loaded: boolean;
   user: User | undefined;
 }
 
-const initialState: SecurityState = {
+const initialState: SecurityReducer = {
   loaded: false,
   user: undefined,
 };
 
 export const securityFeature = createFeature({
   name: 'security',
-  reducer: createReducer<SecurityState>(
+  reducer: createReducer<SecurityReducer>(
     initialState,
     on(
       securityActions.loadUserSuccess,
       securityActions.signInUserSuccess,
-      (state, { user }): SecurityState => ({
+      (state, { user }): SecurityReducer => ({
         ...state,
         user,
         loaded: true,
@@ -34,7 +34,7 @@ export const securityFeature = createFeature({
     ),
     on(
       securityActions.signOutUserSuccess,
-      (state, { user }): SecurityState => ({
+      (state, { user }): SecurityReducer => ({
         ...state,
         user,
       })
