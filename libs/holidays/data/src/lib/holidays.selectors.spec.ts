@@ -7,6 +7,7 @@ it('should select the holidays with ids and titles', () => {
     holidays: createHolidays({ title: 'Pyramids' }, { title: 'Tower Bridge' }),
     favouriteIds: [],
     loadStatus: 'not loaded',
+    histories: {},
   };
 
   expect(fromHolidays.selectIdTitles.projector(state.holidays)).toEqual([

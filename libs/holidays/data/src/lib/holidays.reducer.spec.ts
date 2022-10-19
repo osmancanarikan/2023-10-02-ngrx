@@ -9,7 +9,7 @@ it('should add the holidays on loaded', () => {
   );
 
   const state = holidaysFeature.reducer(
-    { holidays: [], favouriteIds: [], loadStatus: 'not loaded' },
+    { holidays: [], favouriteIds: [], loadStatus: 'not loaded', histories: {} },
     holidaysActions.loaded({ holidays })
   );
 

@@ -1,7 +1,6 @@
 import { Action, Store } from '@ngrx/store';
 import { customersFeature } from './customers.reducer';
 import { firstValueFrom, Observable, of } from 'rxjs';
-import { CustomersEffects } from './customers.effects';
 import { customersActions } from './customers.actions';
 import { createMock, Mock } from '@testing-library/angular/jest-utils';
 import { HttpClient, HttpParams } from '@angular/common/http';
@@ -10,6 +9,9 @@ import { Configuration } from '@eternal/shared/config';
 import { MessageService } from '@eternal/shared/ui-messaging';
 import { marbles } from 'rxjs-marbles/jest';
 import { createCustomer } from '@eternal/customers/model';
+import { RestoreFunction, safeMockInject } from '@eternal/shared/testing';
+import { Actions } from '@ngrx/effects';
+import { CustomersEffects } from './customers.effects';
 
 describe('Customer Effects', () => {
   let httpClient: Mock<HttpClient>;
@@ -17,6 +19,7 @@ describe('Customer Effects', () => {
   let configuration: Mock<Configuration>;
   let router: Mock<Router>;
   let messageService: Mock<MessageService>;
+  let restoreMock: RestoreFunction;
 
   beforeEach(() => {
     httpClient = createMock(HttpClient);
@@ -26,15 +29,19 @@ describe('Customer Effects', () => {
     messageService = createMock(MessageService);
   });
 
-  const createEffect = (actions$: Observable<Action>) =>
-    new CustomersEffects(
-      actions$,
-      httpClient,
-      router,
-      store,
-      configuration,
-      messageService
-    );
+  afterEach(() => restoreMock);
+
+  const createEffect = (actions$: Observable<Action>) => {
+    restoreMock = safeMockInject
+      .with(Actions, actions$)
+      .with(HttpClient, httpClient)
+      .with(Router, router)
+      .with(Store, store)
+      .with(Configuration, configuration)
+      .with(MessageService, messageService)
+      .getRestoreFn();
+    return new CustomersEffects();
+  };
 
   describe('init', () => {
     it('should  dispatch get if not loaded', async () => {
