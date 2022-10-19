@@ -8,7 +8,7 @@ export const holidaysRoutes: Routes = [
   {
     path: '',
     canActivate: [HolidaysDataGuard],
-    providers: [holidaysDataProvider],
+    providers: holidaysDataProvider,
     children: [
       {
         path: '',

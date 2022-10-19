@@ -5,9 +5,9 @@ import {
   LoaderComponent,
   MessageComponent,
 } from '@eternal/shared/ui-messaging';
-import { RouterModule } from '@angular/router';
 import { SidemenuComponent } from './sidemenu/sidemenu.component';
 import { HeaderComponent } from './header/header.component';
+import { RouterOutlet } from '@angular/router';
 
 @Component({
   selector: 'eternal-root',
@@ -18,10 +18,10 @@ import { HeaderComponent } from './header/header.component';
     MatToolbarModule,
     MatSidenavModule,
     LoaderComponent,
-    RouterModule,
     MessageComponent,
     SidemenuComponent,
     HeaderComponent,
+    RouterOutlet,
   ],
 })
 export class AppComponent {}
