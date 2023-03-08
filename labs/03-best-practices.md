@@ -25,7 +25,7 @@ Implement a full cache for the holidays feature.
 
 **1. `loadStatus` property in `State`**
 
-Update the `HolidaysState`, by adding a property called `loadStatus`. It should be of type `LoadStatus` which `shared-ngrx-utils` provides. `LoadStatus` is a union type `not loaded | loading | loaded`. The initial value should be `not loaded`.
+Update the `HolidaysState`, by adding a further property called `loadStatus`. It should be of type `LoadStatus` which `shared-ngrx-utils` provides. `LoadStatus` is a union type `not loaded | loading | loaded`. The initial value should be `not loaded`.
 
 <details>
 <summary>Show Solution</summary>
@@ -72,8 +72,8 @@ export const holidaysActions = createActionGroup({
     Get: emptyProps(), // <--- add this
     Load: emptyProps(),
     // ...
-  },
-});
+  }
+}
 ```
 
 _holidays.effects.ts_
@@ -82,10 +82,10 @@ _holidays.effects.ts_
 @Injectable()
 export class HolidaysEffects {
   get$ = createEffect(() => {
-    return this.#actions$.pipe(
+    return this.actions$.pipe(
       ofType(holidaysActions.get),
       concatLatestFrom(() =>
-        this.#store.select(holidaysFeature.selectLoadStatus)
+        this.store.select(holidaysFeature.selectLoadStatus)
       ),
       filter(([, loadStatus]) => loadStatus === 'not loaded'),
       map(() => holidaysActions.load())
@@ -183,7 +183,7 @@ _holidays-data.guard.ts_
 
 ```typescript
 import { CanActivate, UrlTree } from '@angular/router';
-import { inject, Injectable } from '@angular/core';
+import { Injectable } from '@angular/core';
 import { fromHolidays, holidaysActions } from '@eternal/holidays/data';
 import { Store } from '@ngrx/store';
 import { filter } from 'rxjs/operators';
@@ -193,13 +193,10 @@ import { Observable } from 'rxjs';
   providedIn: 'root',
 })
 export class HolidaysDataGuard implements CanActivate {
-  #store = inject(Store);
-
+  constructor(private store: Store) {}
   canActivate(): Observable<boolean | UrlTree> {
-    this.#store.dispatch(holidaysActions.get());
-    return this.#store
-      .select(fromHolidays.selectIsLoaded)
-      .pipe(filter(Boolean));
+    this.store.dispatch(holidaysActions.get());
+    return this.store.select(fromHolidays.selectIsLoaded).pipe(filter(Boolean));
   }
 }
 ```
@@ -217,7 +214,7 @@ export const holidaysRoutes: Routes = [
   {
     path: '',
     canActivate: [HolidaysDataGuard],
-    providers: holidaysDataProvider,
+    providers: [holidaysDataProvider],
     children: [
       {
         path: '',
@@ -254,9 +251,9 @@ _holidays.component.ts_
   styleUrls: ['./holidays.component.scss'],
 })
 export class HolidaysComponent {
-  #store = inject(Store);
+  holidays$ = this.store.select(fromHolidays.selectHolidaysWithFavourite);
 
-  holidays$ = this.#store.select(fromHolidays.selectHolidaysWithFavourite);
+  constructor(private store: Store) {}
 
   // ...
 }
@@ -301,7 +298,7 @@ export const customersActions = createActionGroup({
 
 ---
 
-**2. Adopt reducer and state**
+**2. Adapt reducer and state**
 
 The `CustomerState` gets a new property `isLoaded` which is set to `false` in the `initialState`. `isLoaded` is set to `true` when the action `loaded` is dispatched.
 
@@ -367,14 +364,13 @@ _customers.effects.ts_
 ```typescript
 @Injectable()
 export class CustomersEffects {
-  // ...
   #baseUrl = '/customers';
 
   init$ = createEffect(() => {
-    return this.#actions$.pipe(
+    return this.actions$.pipe(
       ofType(customersActions.init),
       concatLatestFrom(() =>
-        this.#store.select(customersFeature.selectIsLoaded)
+        this.store.select(customersFeature.selectIsLoaded)
       ),
       filter(([, isLoaded]) => isLoaded === false),
       map(() => customersActions.get({ page: 1 }))
@@ -382,9 +378,9 @@ export class CustomersEffects {
   });
 
   get$ = createEffect(() => {
-    return this.#actions$.pipe(
+    return this.actions$.pipe(
       ofType(customersActions.get),
-      concatLatestFrom(() => this.#store.select(customersFeature.selectPage)),
+      concatLatestFrom(() => this.store.select(customersFeature.selectPage)),
       filter(([action, page]) => action.page !== page),
       map(([{ page }]) => customersActions.load({ page }))
     );
@@ -399,7 +395,7 @@ export class CustomersEffects {
 
 ---
 
-**4. Adopt Repository**
+**4. Adapt Repository**
 
 And for everyone outside of NgRx, we have to expose the new changes as well.
 
@@ -456,15 +452,8 @@ export class CustomersContainerComponent {
 _data-guard.ts_
 
 ```typescript
-import { inject, Injectable } from '@angular/core';
-import { CanActivate } from '@angular/router';
-import { CustomersRepository } from '@eternal/customers/data';
-
-@Injectable({
-  providedIn: 'root',
-})
 export class DataGuard implements CanActivate {
-  #customersRepository = inject(CustomersRepository);
+  constructor(private customersRepository: CustomersRepository) {}
 
   canActivate(): boolean {
     this.#customersRepository.init();
@@ -488,10 +477,10 @@ _customers.effect.ts_
 
 ```typescript
 load$ = createEffect(() =>
-  this.#actions$.pipe(
+  this.actions$.pipe(
     ofType(load),
     switchMap(({ page }) =>
-      this.http
+      this.#http
         .get<{ content: Customer[]; total: number }>(this.#baseUrl, {
           params: new HttpParams().set('page', page),
         })
@@ -719,7 +708,7 @@ _customers-repository.services.ts_
 export class CustomersRepository {
   // ...
 
-  readonly hasError$: Observable<boolean> = this.#store.select(
+  readonly hasError$: Observable<boolean> = this.store.select(
     customersFeature.selectHasError
   );
 
@@ -741,16 +730,8 @@ The `CustomerRootComponent` should do the redirection, if `hasError` is set to Â
 _customer-root.component.ts_
 
 ```typescript
-import { Component } from '@angular/core';
-import { Router, RouterOutlet } from '@angular/router';
-import { CustomersRepository } from '@eternal/customers/data';
-import { MessageService } from '@eternal/shared/ui-messaging';
-import { first } from 'rxjs';
-
 @Component({
   templateUrl: './customers-root.component.html',
-  standalone: true,
-  imports: [RouterOutlet],
 })
 export class CustomersRootComponent {
   constructor(
@@ -766,6 +747,7 @@ export class CustomersRootComponent {
     });
   }
 }
+// ...
 ```
 
 </p>
@@ -803,7 +785,7 @@ update$ = createEffect(() => {
   return this.actions$.pipe(
     ofType(customersActions.update),
     concatMap(({ customer, forward, message }) =>
-      this.#http.put<Customer[]>(this.#baseUrl, customer).pipe(
+      this.http.put<Customer[]>(this.#baseUrl, customer).pipe(
         tap(() => this.#uiMessage.info(message)),
         tap(() => this.#router.navigateByUrl(forward))
       )
@@ -884,17 +866,17 @@ _customers.effects.ts_
 
 ```typescript
 update$ = createEffect(() => {
-  return this.#actions$.pipe(
+  return this.actions$.pipe(
     ofType(customersActions.update),
     concatMap(({ customer, forward, message, callback }) =>
-      this.#http.put<Customer[]>(this.#baseUrl, customer).pipe(
+      this.http.put<Customer[]>(this.#baseUrl, customer).pipe(
         tap(() => {
           if (callback !== undefined) {
             callback();
           }
         }),
-        tap(() => this.#uiMessage.info(message)),
-        tap(() => this.#router.navigateByUrl(forward))
+        tap(() => this.uiMessage.info(message)),
+        tap(() => this.router.navigateByUrl(forward))
       )
     ),
     map(() => customersActions.load({ page: 1 }))
@@ -914,7 +896,7 @@ export class CustomersRepository {
     message: string,
     callback?: () => void
   ): void {
-    this.#store.dispatch(
+    this.store.dispatch(
       customersActions.update({ customer, forward, message, callback })
     );
   }
@@ -985,13 +967,12 @@ _bookings-effects.services.ts_
 ```typescript
 @Injectable()
 export class BookingsEffects {
-  #customersApi = inject(CustomersApi);
+  constructor(private customersApi: CustomersApi) {}
 
   selectedCustomer$ = createEffect(() => {
-    return this.#customersApi.selectedCustomer$.pipe(
-      map(({ id }) =>
-        bookingsActions.loaded({ bookings: bookings.get(id) || [] })
-      )
+    return this.customersApi.selectedCustomer$.pipe(
+      pluck('id'),
+      map((id) => bookingsActions.loaded({ bookings: bookings.get(id) || [] }))
     );
   });
 }
