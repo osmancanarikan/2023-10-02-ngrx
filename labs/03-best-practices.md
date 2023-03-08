@@ -412,14 +412,12 @@ _customers-repository.service.ts_
 export class CustomersRepository {
   // ...
 
-  constructor(private store: Store) {}
-
   init(): void {
-    this.store.dispatch(customersActions.init());
+    this.#store.dispatch(customersActions.init());
   }
 
   get(page: number): void {
-    this.store.dispatch(customersActions.get({ page }));
+    this.#store.dispatch(customersActions.get({ page }));
   }
 
   // ...
@@ -446,7 +444,7 @@ export class CustomersContainerComponent {
   // ...
 
   switchPage(page: number) {
-    this.customersRepository.get(page + 1);
+    this.#customersRepository.get(page + 1);
   }
 }
 ```
@@ -458,7 +456,7 @@ export class DataGuard implements CanActivate {
   constructor(private customersRepository: CustomersRepository) {}
 
   canActivate(): boolean {
-    this.customersRepository.init();
+    this.#customersRepository.init();
     return true;
   }
 }
@@ -482,7 +480,7 @@ load$ = createEffect(() =>
   this.actions$.pipe(
     ofType(load),
     switchMap(({ page }) =>
-      this.http
+      this.#http
         .get<{ content: Customer[]; total: number }>(this.#baseUrl, {
           params: new HttpParams().set('page', page),
         })
@@ -634,7 +632,7 @@ export class CustomersEffects {
       ofType(customersActions.load),
       safeSwitchMap(
         ({ page }) =>
-          this.http
+          this.#http
             .get<{ content: Customer[]; total: number }>(this.#baseUrl, {
               params: new HttpParams().set('page', page),
             })
@@ -788,8 +786,8 @@ update$ = createEffect(() => {
     ofType(customersActions.update),
     concatMap(({ customer, forward, message }) =>
       this.http.put<Customer[]>(this.#baseUrl, customer).pipe(
-        tap(() => this.uiMessage.info(message)),
-        tap(() => this.router.navigateByUrl(forward))
+        tap(() => this.#uiMessage.info(message)),
+        tap(() => this.#router.navigateByUrl(forward))
       )
     ),
     map(() => customersActions.load({ page: 1 }))
@@ -805,7 +803,7 @@ export class CustomersRepository {
   // ...
 
   update(customer: Customer, forward: string, message: string): void {
-    this.store.dispatch(
+    this.#store.dispatch(
       customersActions.update({ customer, forward, message })
     );
   }
